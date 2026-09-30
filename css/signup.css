@@ -1,0 +1,274 @@
+/* ================================
+   SIGNUP PAGE
+================================ */
+
+.signup-page {
+    min-height: calc(100vh - 90px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 60px 20px;
+
+    background: #FAFAF8;
+}
+
+.signup-section {
+    width: 100%;
+    max-width: 480px;
+}
+
+
+/* Card */
+
+.signup-card {
+    background: #FFFFFF;
+
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+
+    padding: 42px;
+
+    box-shadow: 0 12px 35px rgba(31, 41, 55, 0.06);
+}
+
+
+/* Header */
+
+.signup-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.signup-tag {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #2D7FF9;
+}
+
+.signup-header h1 {
+    margin: 12px 0 10px;
+
+    color: #1F2937;
+
+    font-size: 34px;
+    font-weight: 600;
+}
+
+.signup-header p {
+    margin: 0;
+
+    color: #6B7280;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* Form */
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    border: 1px solid #D1D5DB;
+    border-radius: 9px;
+
+    background: #FFFFFF;
+
+    color: #1F2937;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+
+    outline: none;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #9CA3AF;
+}
+
+.form-group input:focus {
+    border-color: #2D7FF9;
+
+    box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.10);
+}
+
+
+/* Button */
+
+.signup-submit {
+    width: 100%;
+
+    margin-top: 8px;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #1F5FBF;
+    color: #FFFFFF;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: background 0.25s ease;
+}
+
+.signup-submit:hover {
+    background: #174C9B;
+}
+
+
+/* Login */
+
+.login-text {
+    text-align: center;
+
+    margin-top: 25px;
+
+    color: #6B7280;
+    font-size: 13px;
+}
+
+.login-text a {
+    color: #1F5FBF;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* Footer */
+
+.simple-footer {
+    text-align: center;
+
+    padding: 22px;
+
+    border-top: 1px solid #E5E7EB;
+
+    background: #FFFFFF;
+}
+
+.simple-footer p {
+    margin: 0;
+
+    color: #6B7280;
+    font-size: 13px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 500px) {
+
+    .signup-page {
+        padding: 40px 18px;
+    }
+
+    .signup-card {
+        padding: 30px 24px;
+    }
+
+    .signup-header h1 {
+        font-size: 29px;
+    }
+}
+
+/* ================================
+   AUTH MESSAGES
+================================ */
+
+.auth-message {
+    padding: 12px 14px;
+    margin-bottom: 20px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+.auth-message.error {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+}
+
+.auth-message.success {
+    background: #F0FDF4;
+    color: #15803D;
+    border: 1px solid #BBF7D0;
+}
+
+.auth-message.info {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+}
+
+
+/* Logged-in navigation */
+
+.welcome-user {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.logout-btn {
+    display: inline-block;
+
+    padding: 9px 18px;
+
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+
+    color: #374151;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    border-color: #2D7FF9;
+    color: #2D7FF9;
+}

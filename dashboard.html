@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Verilancer</title>
+
+    <link rel="icon" href="images/logo verilancer.jpeg">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <a href="index.html">
+                <img src="images/logo verilancer.jpeg" alt="Verilancer Logo">
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="sidebar-link active">
+                <i class="fa-solid fa-grid-2"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Find Projects</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>My Projects</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-regular fa-message"></i>
+                <span>Messages</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-regular fa-user"></i>
+                <span>Profile</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Payments</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="index.html" class="sidebar-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Back to Website</span>
+            </a>
+
+            <a href="#" class="sidebar-link logout-link" data-dashboard-logout>
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Log Out</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+
+        <!-- TOP BAR -->
+        <header class="dashboard-header">
+
+            <div class="mobile-menu">
+                <button id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="header-title">
+                <h1>Dashboard</h1>
+                <p>Manage your Verilancer journey from here.</p>
+            </div>
+
+            <div class="header-actions">
+
+                <button class="notification-btn" title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="profile-mini">
+                    <div class="profile-avatar" id="profileAvatar">
+                        M
+                    </div>
+
+                    <div class="profile-info">
+                        <strong id="headerUserName">User</strong>
+                        <span id="headerUserRole">Professional</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- WELCOME -->
+        <section class="welcome-section">
+
+            <div>
+                <span class="welcome-label">WELCOME BACK</span>
+
+                <h2>
+                    Hello, <span id="welcomeUserName">there</span>!
+                </h2>
+
+                <p id="welcomeDescription">
+                    Here's what's happening with your Verilancer account.
+                </p>
+            </div>
+
+            <button class="primary-action" id="mainActionBtn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Explore Opportunities</span>
+            </button>
+
+        </section>
+
+
+        <!-- OVERVIEW CARDS -->
+        <section class="overview-grid">
+
+            <div class="overview-card">
+
+                <div class="overview-icon blue">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+
+                <div class="overview-content">
+                    <span>Active Projects</span>
+                    <strong id="activeProjects">0</strong>
+                </div>
+
+                <span class="overview-arrow">
+                    <i class="fa-solid fa-arrow-up-right"></i>
+                </span>
+
+            </div>
+
+
+            <div class="overview-card">
+
+                <div class="overview-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="overview-content">
+                    <span>Completed Projects</span>
+                    <strong id="completedProjects">0</strong>
+                </div>
+
+                <span class="overview-arrow">
+                    <i class="fa-solid fa-arrow-up-right"></i>
+                </span>
+
+            </div>
+
+
+            <div class="overview-card">
+
+                <div class="overview-icon purple">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div class="overview-content">
+                    <span>Total Earnings</span>
+                    <strong id="totalEarnings">₹0</strong>
+                </div>
+
+                <span class="overview-arrow">
+                    <i class="fa-solid fa-arrow-up-right"></i>
+                </span>
+
+            </div>
+
+
+            <div class="overview-card">
+
+                <div class="overview-icon orange">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+
+                <div class="overview-content">
+                    <span>Pending Payments</span>
+                    <strong id="pendingPayments">₹0</strong>
+                </div>
+
+                <span class="overview-arrow">
+                    <i class="fa-solid fa-arrow-up-right"></i>
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- DASHBOARD GRID -->
+        <section class="dashboard-grid">
+
+            <!-- RECENT PROJECTS -->
+            <div class="dashboard-card projects-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h3>Recent Projects</h3>
+                        <p>Your latest project activity.</p>
+                    </div>
+
+                    <a href="#" class="view-all">View All</a>
+
+                </div>
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+
+                    <h4>No projects yet</h4>
+
+                    <p>
+                        Your projects will appear here once you start working through Verilancer.
+                    </p>
+
+                    <button class="secondary-action" id="projectsAction">
+                        Explore Projects
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECOMMENDED -->
+            <div class="dashboard-card recommended-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h3 id="recommendationTitle">
+                            Recommended Opportunities
+                        </h3>
+
+                        <p id="recommendationSubtitle">
+                            Opportunities that may interest you.
+                        </p>
+                    </div>
+
+                    <i class="fa-solid fa-wand-magic-sparkles recommendation-icon"></i>
+
+                </div>
+
+
+                <div class="recommendation-item">
+
+                    <div class="recommendation-symbol">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+
+                    <div>
+                        <strong>Development Projects</strong>
+                        <p>Explore software & development opportunities.</p>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </div>
+
+
+                <div class="recommendation-item">
+
+                    <div class="recommendation-symbol">
+                        <i class="fa-solid fa-pen-ruler"></i>
+                    </div>
+
+                    <div>
+                        <strong>Creative Projects</strong>
+                        <p>Discover design and creative requirements.</p>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </div>
+
+
+                <button class="full-width-action" id="recommendationAction">
+                    Explore Opportunities
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUICK ACTIONS -->
+        <section class="quick-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <h3>Quick Actions</h3>
+                    <p>Get started with what you want to accomplish.</p>
+                </div>
+
+            </div>
+
+
+            <div class="quick-grid">
+
+                <a href="#" class="quick-card">
+
+                    <div class="quick-icon">
+                        <i class="fa-solid fa-user-pen"></i>
+                    </div>
+
+                    <div>
+                        <strong>Complete Your Profile</strong>
+                        <span>Showcase your skills and experience.</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+
+                <a href="#" class="quick-card">
+
+                    <div class="quick-icon">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <div>
+                        <strong>Explore Opportunities</strong>
+                        <span>Find projects that match your skills.</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+
+                <a href="#" class="quick-card">
+
+                    <div class="quick-icon">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+
+                    <div>
+                        <strong>Post a Requirement</strong>
+                        <span>Tell talented professionals what you need.</span>
+                    </div>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="dashboard-footer">
+            <p>© 2026 Verilancer. Where talent meets opportunities.</p>
+        </footer>
+
+    </main>
+
+
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>

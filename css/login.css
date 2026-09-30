@@ -1,0 +1,301 @@
+/* ================================
+   LOGIN PAGE
+================================ */
+
+.login-page {
+    min-height: calc(100vh - 90px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 60px 20px;
+
+    background: #FAFAF8;
+}
+
+.login-section {
+    width: 100%;
+    max-width: 450px;
+}
+
+
+/* Card */
+
+.login-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+
+    padding: 42px;
+
+    box-shadow: 0 12px 35px rgba(31, 41, 55, 0.06);
+}
+
+
+/* Header */
+
+.login-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.login-tag {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #2D7FF9;
+}
+
+.login-header h1 {
+    margin: 12px 0 10px;
+
+    font-size: 34px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.login-header p {
+    margin: 0;
+
+    color: #6B7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* Form */
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.password-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.password-label a {
+    color: #2D7FF9;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.password-label a:hover {
+    text-decoration: underline;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 13px 14px;
+
+    border: 1px solid #D1D5DB;
+    border-radius: 9px;
+
+    background: #FFFFFF;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    color: #1F2937;
+
+    outline: none;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #9CA3AF;
+}
+
+.form-group input:focus {
+    border-color: #2D7FF9;
+    box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.10);
+}
+
+
+/* Login button */
+
+.login-submit {
+    width: 100%;
+
+    border: none;
+    border-radius: 9px;
+
+    padding: 14px;
+
+    background: #1F5FBF;
+    color: #FFFFFF;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: background 0.25s ease;
+}
+
+.login-submit:hover {
+    background: #174C9B;
+}
+
+
+/* Divider */
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    margin: 28px 0;
+
+    color: #9CA3AF;
+    font-size: 11px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #E5E7EB;
+}
+
+
+/* Signup */
+
+.signup-text {
+    text-align: center;
+
+    color: #6B7280;
+    font-size: 13px;
+}
+
+.signup-text a {
+    color: #1F5FBF;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.signup-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* Footer */
+
+.simple-footer {
+    text-align: center;
+
+    padding: 22px;
+
+    border-top: 1px solid #E5E7EB;
+
+    background: #FFFFFF;
+}
+
+.simple-footer p {
+    margin: 0;
+
+    color: #6B7280;
+    font-size: 13px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 500px) {
+
+    .login-page {
+        padding: 40px 18px;
+    }
+
+    .login-card {
+        padding: 30px 24px;
+    }
+
+    .login-header h1 {
+        font-size: 29px;
+    }
+}
+
+/* ================================
+   AUTH MESSAGES
+================================ */
+
+.auth-message {
+    padding: 12px 14px;
+    margin-bottom: 20px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+.auth-message.error {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+}
+
+.auth-message.success {
+    background: #F0FDF4;
+    color: #15803D;
+    border: 1px solid #BBF7D0;
+}
+
+.auth-message.info {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+}
+
+
+/* Logged-in navigation */
+
+.welcome-user {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.logout-btn {
+    display: inline-block;
+
+    padding: 9px 18px;
+
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+
+    color: #374151;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    border-color: #2D7FF9;
+    color: #2D7FF9;
+}
