@@ -170,6 +170,186 @@ app.get("/api/profile/:userId", (req, res) => {
     });
 });
 
+
+/* =====================================
+   PROJECT MARKETPLACE API
+===================================== */
+
+// Business posts a project
+app.post("/api/projects", (req, res) => {
+    const {
+        businessId,
+        title,
+        description,
+        category,
+        budget,
+        requiredSkills,
+        deadline
+    } = req.body;
+
+    if (
+        !businessId ||
+        !title?.trim() ||
+        !description?.trim() ||
+        !category?.trim()
+    ) {
+        return res.status(400).json({
+            message: "Business ID, title, description and category are required."
+        });
+    }
+
+    const parsedBudget =
+        budget === "" || budget === null || budget === undefined
+            ? null
+            : Number(budget);
+
+    if (
+        parsedBudget !== null &&
+        (!Number.isFinite(parsedBudget) || parsedBudget < 0)
+    ) {
+        return res.status(400).json({
+            message: "Please enter a valid, non-negative budget."
+        });
+    }
+
+    // Confirm that the account is a business (client)
+    db.query(
+        "SELECT id FROM users WHERE id = ? AND role = 'client'",
+        [businessId],
+        (err, users) => {
+            if (err) {
+                console.error("Business verification error:", err);
+                return res.status(500).json({
+                    message: "Unable to verify business account."
+                });
+            }
+
+            if (users.length === 0) {
+                return res.status(403).json({
+                    message: "Only business accounts can post projects."
+                });
+            }
+
+            const sql = `
+                INSERT INTO projects
+                (business_id, title, description, category, budget,
+                 required_skills, deadline)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const values = [
+                businessId,
+                title.trim(),
+                description.trim(),
+                category.trim(),
+                parsedBudget,
+                requiredSkills?.trim() || null,
+                deadline || null
+            ];
+
+            db.query(sql, values, (insertError, result) => {
+                if (insertError) {
+                    console.error("Project creation error:", insertError);
+                    return res.status(500).json({
+                        message: "Failed to post project."
+                    });
+                }
+
+                res.status(201).json({
+                    message: "Project posted successfully!",
+                    projectId: result.insertId
+                });
+            });
+        }
+    );
+});
+
+
+// Browse published projects
+app.get("/api/projects", (req, res) => {
+    const sql = `
+        SELECT
+            p.id,
+            p.title,
+            p.description,
+            p.category,
+            p.budget,
+            p.required_skills AS requiredSkills,
+            p.deadline,
+            p.status,
+            p.created_at AS createdAt,
+            u.name AS businessName
+        FROM projects p
+        JOIN users u ON p.business_id = u.id
+        WHERE p.status = 'published'
+        ORDER BY p.created_at DESC
+    `;
+
+    db.query(sql, (err, projects) => {
+        if (err) {
+            console.error("Project browsing error:", err);
+            return res.status(500).json({
+                message: "Failed to load projects."
+            });
+        }
+
+        res.status(200).json(projects);
+    });
+});
+
+
+// View projects posted by a business
+app.get("/api/projects/mine/:businessId", (req, res) => {
+    const { businessId } = req.params;
+
+    db.query(
+        "SELECT id FROM users WHERE id = ? AND role = 'client'",
+        [businessId],
+        (err, users) => {
+            if (err) {
+                console.error("Business verification error:", err);
+                return res.status(500).json({
+                    message: "Unable to verify business account."
+                });
+            }
+
+            if (users.length === 0) {
+                return res.status(403).json({
+                    message: "A valid business account is required."
+                });
+            }
+
+            const sql = `
+                SELECT
+                    id,
+                    title,
+                    description,
+                    category,
+                    budget,
+                    required_skills AS requiredSkills,
+                    deadline,
+                    status,
+                    created_at AS createdAt
+                FROM projects
+                WHERE business_id = ?
+                ORDER BY created_at DESC
+            `;
+
+            db.query(sql, [businessId], (projectError, projects) => {
+                if (projectError) {
+                    console.error("My projects error:", projectError);
+                    return res.status(500).json({
+                        message: "Failed to load your projects."
+                    });
+                }
+
+                res.status(200).json(projects);
+            });
+        }
+    );
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
