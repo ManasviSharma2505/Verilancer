@@ -117,6 +117,7 @@ if (loginForm) {
                 "verilancerUser",
                 JSON.stringify(data.user)
             );
+            localStorage.setItem("verilancerLoggedIn", "true");
 
             alert("Login successful!");
 

@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const userName = user.name || "User";
-    const userRole = user.role === "business" ? "business" : "professional";
+    const userRole = user.role === "client" ? "business" : "professional";
     const isBusiness = userRole === "business";
 
     // 2. Helper functions
@@ -164,6 +164,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (confirmLogout) {
                 localStorage.removeItem("verilancerLoggedIn");
+                localStorage.removeItem("verilancerUser");
+
                 window.location.href = "index.html";
             }
         });

@@ -129,6 +129,47 @@ app.post("/api/login", async (req, res) => {
     });
 });
 
+app.get("/api/test", (req, res) => {
+    res.json({ message: "API routes are working" });
+});
+
+app.get("/api/profile/:userId", (req, res) => {
+    const { userId } = req.params;
+
+    const sql = `
+        SELECT 
+            u.name,
+            u.email,
+            u.role,
+            p.bio,
+            p.skills,
+            p.phone,
+            p.location
+        FROM users u
+        LEFT JOIN professional_profiles p
+            ON u.id = p.user_id
+        WHERE u.id = ?
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error("Profile fetch error:", err);
+
+            return res.status(500).json({
+                message: "Failed to fetch profile."
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                message: "User not found."
+            });
+        }
+
+        res.status(200).json(results[0]);
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
