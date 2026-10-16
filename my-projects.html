@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects | Verilancer</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/my-projects.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="my-projects-page">
+    <header class="my-projects-header">
+        <a href="dashboard.html" class="my-projects-brand">Verilancer</a>
+
+        <nav class="my-projects-nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Browse Projects</a>
+            <a href="post-project.html">Post a Project</a>
+        </nav>
+    </header>
+
+    <main class="my-projects-container">
+        <section class="my-projects-intro">
+            <p>YOUR BUSINESS WORKSPACE</p>
+            <h1>My Projects</h1>
+            <p>Everything you've published, organised in one place.</p>
+        </section>
+
+        <div id="myProjectsMessage" role="status"></div>
+
+        <section id="myProjectsList" aria-live="polite">
+            <p>Loading your projects...</p>
+        </section>
+    </main>
+
+    <script src="js/my-projects.js"></script>
+</body>
+</html>
