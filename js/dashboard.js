@@ -87,29 +87,123 @@ document.addEventListener("DOMContentLoaded", function () {
     setText("totalEarnings", "₹0");
     setText("pendingPayments", "₹0");
 
+    
+    // Load real projects into the Recent Projects dashboard card
+    const recentProjectsList = get("recentProjectsList");
+    const recentProjectsEmpty = get("recentProjectsEmpty");
+
+    async function loadRecentProjects() {
+        if (!recentProjectsList) return;
+
+        try {
+            const endpoint = isBusiness
+                ? `http://localhost:5001/api/projects/mine/${encodeURIComponent(user.id)}`
+                : "http://localhost:5001/api/projects";
+
+            const response = await fetch(endpoint);
+            const projects = await response.json();
+
+            if (!response.ok) {
+                throw new Error(projects.message || "Unable to load projects.");
+            }
+
+            if (!Array.isArray(projects) || projects.length === 0) {
+                recentProjectsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <h4>No projects yet</h4>
+                        <p>${
+                            isBusiness
+                                ? "Projects you publish will appear here."
+                                : "New opportunities from businesses will appear here."
+                        }</p>
+                        <button class="secondary-action" id="projectsAction" type="button">
+                            ${isBusiness ? "Post a Requirement" : "Explore Projects"}
+                        </button>
+                    </div>
+                `;
+
+                get("projectsAction")?.addEventListener("click", () => {
+                    window.location.href = isBusiness
+                        ? "post-project.html"
+                        : "projects.html";
+                });
+
+                return;
+            }
+
+            const recentProjects = projects.slice(0, 3);
+
+            recentProjectsList.innerHTML = recentProjects.map(project => `
+                <article class="recent-project-item">
+                    <div class="recent-project-heading">
+                        <h4>${escapeDashboardHtml(project.title)}</h4>
+                        <span class="recent-project-category">
+                            ${escapeDashboardHtml(project.category)}
+                        </span>
+                    </div>
+                    <p class="recent-project-description">
+                        ${escapeDashboardHtml(project.description)}
+                    </p>
+                    <div class="recent-project-meta">
+                        <span>Budget: ${
+                            project.budget === null || project.budget === undefined
+                                ? "Not specified"
+                                : "₹" + Number(project.budget).toLocaleString("en-IN")
+                        }</span>
+                        ${
+                            project.deadline
+                                ? `<span>Deadline: ${escapeDashboardHtml(String(project.deadline).slice(0, 10))}</span>`
+                                : ""
+                        }
+                    </div>
+                </article>
+            `).join("");
+
+        } catch (error) {
+            console.error("Recent projects error:", error);
+
+            recentProjectsList.innerHTML = `
+                <div class="empty-state">
+                    <h4>Projects couldn't be loaded</h4>
+                    <p>Please make sure the Verilancer backend is running, then refresh.</p>
+                </div>
+            `;
+        }
+    }
+
+    function escapeDashboardHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    loadRecentProjects();
+
+    
     // 6. Main dashboard actions
+    const openMarketplace = () => {
+        window.location.href = isBusiness
+            ? "post-project.html"
+            : "projects.html";
+    };
+
     if (mainActionBtn) {
-        mainActionBtn.addEventListener("click", function () {
-            showComingSoon(
-                isBusiness ? "Post Requirement" : "Explore Opportunities"
-            );
-        });
+        mainActionBtn.addEventListener("click", openMarketplace);
     }
 
     if (projectsAction) {
-        projectsAction.addEventListener("click", function () {
-            showComingSoon(
-                isBusiness ? "Post Requirement" : "Project Discovery"
-            );
-        });
+        projectsAction.addEventListener("click", openMarketplace);
     }
 
     if (recommendationAction) {
-        recommendationAction.addEventListener("click", function () {
-            showComingSoon(
-                isBusiness ? "Talent Discovery" : "Opportunities"
-            );
-        });
+        recommendationAction.addEventListener("click", openMarketplace);
     }
 
     // 7. Quick action cards
@@ -119,35 +213,57 @@ document.addEventListener("DOMContentLoaded", function () {
         card.addEventListener("click", function (event) {
             event.preventDefault();
 
-            const actions = isBusiness
-                ? ["Profile", "Find Talent", "Post a Requirement"]
-                : ["Profile", "Explore Opportunities", "Project Discovery"];
+            if (index === 0) {
+                // Profile is not connected yet
+                showComingSoon("Profile");
+                return;
+            }
 
-            showComingSoon(actions[index] || "This feature");
+            if (index === 1) {
+                // Explore opportunities / find talent
+                openMarketplace();
+                return;
+            }
+
+            if (index === 2) {
+                // Business can post a project; professional can browse
+                openMarketplace();
+            }
         });
     });
 
-    // 8. Sidebar navigation placeholders
+    // 8. Sidebar navigation
     const sidebarLinks = document.querySelectorAll(
         ".sidebar-nav .sidebar-link"
     );
 
     sidebarLinks.forEach(function (link) {
-        if (link.getAttribute("href") === "#") {
+        const label = link.querySelector("span")?.textContent.trim() || "";
+        const normalizedLabel = label.toLowerCase();
+
+        if (
+            normalizedLabel.includes("find projects") ||
+            normalizedLabel.includes("my projects")
+        ) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                openMarketplace();
+
+                const sidebar = document.querySelector(".sidebar");
+                if (sidebar) sidebar.classList.remove("mobile-open");
+            });
+        } else if (link.getAttribute("href") === "#") {
             link.addEventListener("click", function (event) {
                 event.preventDefault();
 
-                const label = link.querySelector("span")?.textContent.trim()
-                    || "This section";
+                showComingSoon(label || "This section");
 
-                showComingSoon(label);
-
-                // Close mobile sidebar after selection
                 const sidebar = document.querySelector(".sidebar");
                 if (sidebar) sidebar.classList.remove("mobile-open");
             });
         }
     });
+
 
     // 9. Logout with final confirmation
     const logoutButton = document.querySelector(

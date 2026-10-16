@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Project | Verilancer</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <script src="js/marketplace.js" defer></script>
+</head>
+<body>
+    <header class="market-header">
+        <a class="brand" href="index.html">Verilancer<span>.</span></a>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Browse Projects</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+
+        <section class="form-card">
+            <p class="eyebrow">FOR BUSINESSES</p>
+            <h1>Post a Project</h1>
+            <p class="muted">Tell professionals what you need built.</p>
+
+            <form id="projectForm">
+                <label for="title">Project title *</label>
+                <input id="title" name="title" type="text"
+                    maxlength="150" placeholder="e.g. Build an e-commerce website" required>
+
+                <label for="category">Category *</label>
+                <select id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <option>Web Development</option>
+                    <option>App Development</option>
+                    <option>UI/UX Design</option>
+                    <option>Data Analytics</option>
+                    <option>Software Development</option>
+                    <option>Digital Marketing</option>
+                    <option>Other</option>
+                </select>
+
+                <label for="description">Project description *</label>
+                <textarea id="description" name="description" rows="6"
+                    placeholder="Explain the project, its goals and expected deliverables."
+                    required></textarea>
+
+                <div class="form-grid">
+                    <div>
+                        <label for="budget">Budget (₹)</label>
+                        <input id="budget" name="budget" type="number"
+                            min="0" step="0.01" placeholder="e.g. 15000">
+                    </div>
+                    <div>
+                        <label for="deadline">Deadline</label>
+                        <input id="deadline" name="deadline" type="date">
+                    </div>
+                </div>
+
+                <label for="requiredSkills">Required skills</label>
+                <input id="requiredSkills" name="requiredSkills" type="text"
+                    placeholder="e.g. HTML, CSS, JavaScript, React">
+
+                <p id="formMessage" class="form-message" role="status"></p>
+                <button id="submitProject" class="primary-btn" type="submit">
+                    Publish Project
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

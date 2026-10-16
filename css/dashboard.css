@@ -713,3 +713,86 @@ button {
         padding: 19px;
     }
 }
+
+
+/* Recent projects loaded from the marketplace */
+.recent-project-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.recent-project-item:last-child {
+    border-bottom: none;
+}
+
+.recent-project-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.recent-project-heading h4 {
+    margin: 0;
+    font-size: 0.98rem;
+    overflow-wrap: anywhere;
+}
+
+.recent-project-category {
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: #edf4ee;
+    color: #1f5f3b;
+    font-size: 0.75rem;
+}
+
+.recent-project-description {
+    margin: 8px 0;
+    color: #6b7280;
+    font-size: 0.88rem;
+    overflow-wrap: anywhere;
+}
+
+.recent-project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    color: #4b5563;
+    font-size: 0.82rem;
+}
+
+
+/* Recent project cards */
+.recent-project-item {
+    background: #f5f8f3;
+    border: 1px solid #e2e9df;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 12px 0;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.recent-project-item:hover {
+    background: #eef4eb;
+    border-color: #cbdcc6;
+}
+
+.recent-project-item:last-child {
+    border-bottom: 1px solid #e2e9df;
+}
+
+.recent-project-heading h4 {
+    color: #1f2937;
+}
+
+.recent-project-description {
+    line-height: 1.6;
+}
+
+.recent-project-meta span {
+    background: #ffffff;
+    border: 1px solid #e2e9df;
+    border-radius: 7px;
+    padding: 5px 9px;
+}

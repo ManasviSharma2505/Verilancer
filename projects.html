@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Projects | Verilancer</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <script src="js/marketplace.js" defer></script>
+</head>
+<body>
+    <header class="market-header">
+        <a class="brand" href="index.html">Verilancer<span>.</span></a>
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html" aria-current="page">Browse Projects</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+        <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+
+        <section class="market-intro">
+            <p class="eyebrow">OPPORTUNITIES THAT MOVE YOU FORWARD</p>
+            <h1>Find Your Next Project</h1>
+            <p class="muted">Explore opportunities posted by businesses on Verilancer.</p>
+        </section>
+
+        <div class="project-toolbar">
+            <input id="projectSearch" type="search"
+                placeholder="Search by title, category or skill..."
+                aria-label="Search projects">
+            <button id="refreshProjects" class="secondary-btn" type="button">
+                Refresh
+            </button>
+        </div>
+
+        <p id="projectsMessage" class="form-message" role="status">
+            Loading projects...
+        </p>
+
+        <section id="projectsList" class="projects-grid"
+            aria-live="polite"></section>
+    </main>
+</body>
+</html>
