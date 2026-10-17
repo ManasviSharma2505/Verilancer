@@ -53,6 +53,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const projectsAction = get("projectsAction");
     const recommendationAction = get("recommendationAction");
 
+    const postRequirementCard = get("postRequirementCard");
+
+if (postRequirementCard) {
+    postRequirementCard.style.display = isBusiness ? "" : "none";
+}
+
     if (mainActionBtn) {
         mainActionBtn.innerHTML = isBusiness
             ? '<i class="fa-solid fa-plus"></i><span>Post a Requirement</span>'

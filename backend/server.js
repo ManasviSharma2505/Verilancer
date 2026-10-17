@@ -133,6 +133,8 @@ app.get("/api/test", (req, res) => {
     res.json({ message: "API routes are working" });
 });
 
+
+
 app.get("/api/profile/:userId", (req, res) => {
     const { userId } = req.params;
 
@@ -393,6 +395,313 @@ app.patch("/api/projects/:projectId/close", (req, res) => {
         return res.json({
             message: "Project closed successfully."
         });
+    });
+});
+
+
+/* =====================================
+   PROJECT APPLICATIONS API
+===================================== */
+
+// Professional applies to a published project
+app.post("/api/projects/:projectId/applications", (req, res) => {
+    const projectId = Number(req.params.projectId);
+    const professionalId = Number(req.body.professionalId);
+    const proposal = req.body.proposal?.trim();
+    const bidAmount = Number(req.body.bidAmount);
+
+    if (
+    !Number.isInteger(projectId) ||
+    projectId <= 0 ||
+    !Number.isInteger(professionalId) ||
+    professionalId <= 0 ||
+    !proposal ||
+    !Number.isFinite(bidAmount) ||
+    bidAmount <= 0
+) {
+    return res.status(400).json({
+        message: "Valid IDs, a proposal, and a bid amount greater than zero are required."
+    });
+}
+
+    db.query(
+        "SELECT id FROM users WHERE id = ? AND role = 'student'",
+        [professionalId],
+        (userError, users) => {
+            if (userError) {
+                console.error("Applicant verification error:", userError);
+                return res.status(500).json({
+                    message: "Unable to verify professional account."
+                });
+            }
+
+            if (users.length === 0) {
+                return res.status(403).json({
+                    message: "Only professional accounts can apply."
+                });
+            }
+
+            db.query(
+                "SELECT id FROM projects WHERE id = ? AND status = 'published'",
+                [projectId],
+                (projectError, projects) => {
+                    if (projectError) {
+                        console.error("Application project check error:", projectError);
+                        return res.status(500).json({
+                            message: "Unable to verify project."
+                        });
+                    }
+
+                    if (projects.length === 0) {
+                        return res.status(404).json({
+                            message: "Project not found or no longer accepting applications."
+                        });
+                    }
+
+                    const sql = `
+    INSERT INTO project_applications
+        (project_id, professional_id, bid_amount, proposal)
+    VALUES (?, ?, ?, ?)
+`;
+
+db.query(
+    sql,
+    [projectId, professionalId, bidAmount, proposal],
+    (insertErr, result) => {
+        if (insertErr) {
+            if (insertErr.code === "ER_DUP_ENTRY") {
+                return res.status(409).json({
+                    message: "You have already applied to this project."
+                });
+            }
+
+            console.error("Application insert error:", insertErr);
+
+            return res.status(500).json({
+                message: "Unable to submit your application."
+            });
+        }
+
+        return res.status(201).json({
+            message: "Your bid and proposal have been submitted successfully!",
+            applicationId: result.insertId
+        });
+    }
+);
+                }
+            );
+        }
+    );
+});
+
+
+// Professional views their applications
+app.get("/api/applications/mine/:professionalId", (req, res) => {
+    const professionalId = Number(req.params.professionalId);
+
+    if (!Number.isInteger(professionalId) || professionalId <= 0) {
+        return res.status(400).json({
+            message: "A valid professional ID is required."
+        });
+    }
+
+    db.query(
+        "SELECT id FROM users WHERE id = ? AND role = 'student'",
+        [professionalId],
+        (userError, users) => {
+            if (userError) {
+                console.error("Professional verification error:", userError);
+                return res.status(500).json({
+                    message: "Unable to verify professional account."
+                });
+            }
+
+            if (users.length === 0) {
+                return res.status(403).json({
+                    message: "A valid professional account is required."
+                });
+            }
+
+            const sql = `
+                SELECT
+                    a.id AS applicationId,
+                    a.project_id AS projectId,
+                    a.proposal,
+                    a.status AS applicationStatus,
+                    a.created_at AS appliedAt,
+                    p.title,
+                    p.category,
+                    p.budget,
+                    p.deadline,
+                    p.status AS projectStatus,
+                    u.name AS businessName
+                FROM project_applications a
+                JOIN projects p ON a.project_id = p.id
+                JOIN users u ON p.business_id = u.id
+                WHERE a.professional_id = ?
+                ORDER BY a.created_at DESC
+            `;
+
+            db.query(sql, [professionalId], (err, applications) => {
+                if (err) {
+                    console.error("My applications error:", err);
+                    return res.status(500).json({
+                        message: "Failed to load applications."
+                    });
+                }
+
+                return res.json(applications);
+            });
+        }
+    );
+});
+
+
+// Business views applicants for its own project
+
+app.get("/api/projects/:projectId/applications", (req, res) => {
+    const projectId = Number(req.params.projectId);
+    const businessId = Number(req.query.businessId);
+
+    if (
+        !Number.isInteger(projectId) || projectId <= 0 ||
+        !Number.isInteger(businessId) || businessId <= 0
+    ) {
+        return res.status(400).json({
+            message: "Valid project and business IDs are required."
+        });
+    }
+
+    const sql = `
+        SELECT
+            pa.id AS applicationId,
+            pa.project_id AS projectId,
+            pa.professional_id AS professionalId,
+            pa.bid_amount AS bidAmount,
+            pa.proposal,
+            pa.status,
+            pa.created_at AS createdAt,
+            u.name AS professionalName,
+            u.email AS professionalEmail,
+            pp.skills,
+            pp.bio,
+            pp.location
+        FROM project_applications pa
+        JOIN projects p
+            ON p.id = pa.project_id
+        JOIN users u
+            ON u.id = pa.professional_id
+        LEFT JOIN professional_profiles pp
+            ON pp.user_id = u.id
+        WHERE pa.project_id = ?
+          AND p.business_id = ?
+        ORDER BY pa.created_at DESC
+    `;
+
+    db.query(sql, [projectId, businessId], (err, applications) => {
+        if (err) {
+            console.error("Fetch proposals error:", err);
+            return res.status(500).json({
+                message: "Unable to load proposals."
+            });
+        }
+
+        return res.json(applications);
+    });
+});
+
+
+
+// Business updates an application's status
+app.patch("/api/applications/:applicationId/status", (req, res) => {
+    const applicationId = Number(req.params.applicationId);
+    const businessId = Number(req.body.businessId);
+    const status = req.body.status;
+
+    if (
+        !Number.isInteger(applicationId) || applicationId <= 0 ||
+        !Number.isInteger(businessId) || businessId <= 0 ||
+        !["accepted", "rejected"].includes(status)
+    ) {
+        return res.status(400).json({
+            message: "Valid application, business and status are required."
+        });
+    }
+
+    const sql = `
+        UPDATE project_applications a
+        JOIN projects p ON a.project_id = p.id
+        SET a.status = ?
+        WHERE a.id = ?
+          AND p.business_id = ?
+          AND p.status = 'published'
+          AND a.status = 'pending'
+    `;
+
+    db.query(
+        sql,
+        [status, applicationId, businessId],
+        (err, result) => {
+            if (err) {
+                console.error("Application status update error:", err);
+                return res.status(500).json({
+                    message: "Failed to update application status."
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Pending application not found for your published project."
+                });
+            }
+
+            return res.json({
+                message: `Application ${status} successfully.`
+            });
+        }
+    );
+});
+
+
+
+app.get("/api/professional-profiles/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({
+            message: "Valid professional ID is required."
+        });
+    }
+
+    const sql = `
+        SELECT
+            u.id,
+            u.name,
+            pp.skills,
+            pp.bio,
+            pp.location
+        FROM users u
+        LEFT JOIN professional_profiles pp
+            ON pp.user_id = u.id
+        WHERE u.id = ?
+          AND u.role = 'student'
+    `;
+
+    db.query(sql, [userId], (err, rows) => {
+        if (err) {
+            console.error("Professional profile error:", err);
+            return res.status(500).json({
+                message: "Unable to load your professional profile."
+            });
+        }
+
+        if (rows.length === 0) {
+            return res.status(404).json({
+                message: "Professional profile not found."
+            });
+        }
+
+        return res.json(rows[0]);
     });
 });
 

@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const list = document.getElementById("myProjectsList");
     const message = document.getElementById("myProjectsMessage");
 
-    const loggedIn = localStorage.getItem("verilancerLoggedIn");
     let user;
 
     try {
@@ -14,18 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
         user = null;
     }
 
-    if (loggedIn !== "true" || !user) {
+    if (
+        localStorage.getItem("verilancerLoggedIn") !== "true" ||
+        !user
+    ) {
         window.location.href = "login.html";
         return;
     }
 
     if (user.role !== "client") {
-        message.textContent = "This page is available to business accounts.";
+        message.textContent =
+            "This page is available to business accounts.";
         list.innerHTML = "";
         return;
     }
 
-    const escapeHtml = (value) =>
+    const escapeHtml = value =>
         String(value ?? "").replace(/[&<>"']/g, char => ({
             "&": "&amp;",
             "<": "&lt;",
@@ -34,6 +37,143 @@ document.addEventListener("DOMContentLoaded", () => {
             "'": "&#39;"
         })[char]);
 
+    function formatMoney(value) {
+        if (value === null || value === undefined || value === "") {
+            return "Not provided";
+        }
+
+        return "₹" + Number(value).toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+    }
+
+    async function loadProposals(projectId, panel) {
+        panel.innerHTML = "<p>Loading proposals...</p>";
+
+        try {
+            const response = await fetch(
+                `${API_BASE}/projects/${encodeURIComponent(projectId)}/applications?businessId=${encodeURIComponent(user.id)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Unable to load proposals."
+                );
+            }
+
+            if (!Array.isArray(data) || data.length === 0) {
+                panel.innerHTML = `
+                    <div class="proposal-empty">
+                        <h3>No bids yet</h3>
+                        <p>
+                            Proposals from professionals will appear here
+                            when they apply to your project.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            panel.innerHTML = `
+                <div class="proposal-summary">
+                    <h3>Proposals received</h3>
+                    <span>${data.length} bid${data.length === 1 ? "" : "s"}</span>
+                </div>
+
+                <div class="proposal-list">
+                    ${data.map(application => `
+                        <article class="proposal-card">
+                            <div class="proposal-card-heading">
+                                <div>
+                                    <h4>${escapeHtml(
+                                        application.professionalName
+                                        || "Professional"
+                                    )}</h4>
+
+                                    <p class="proposal-email">
+                                        ${escapeHtml(
+                                            application.professionalEmail
+                                            || "Email unavailable"
+                                        )}
+                                    </p>
+                                </div>
+
+                                <span class="proposal-status ${escapeHtml(
+                                    application.status
+                                )}">
+                                    ${escapeHtml(application.status)}
+                                </span>
+                            </div>
+
+                            <div class="proposal-bid">
+                                <span>Professional's bid</span>
+                                <strong>${formatMoney(
+                                    application.bidAmount
+                                )}</strong>
+                            </div>
+
+                            <div class="proposal-details">
+                                <p>
+                                    <strong>Skills:</strong>
+                                    ${escapeHtml(
+                                        application.skills || "Not provided"
+                                    )}
+                                </p>
+
+                                <p>
+                                    <strong>Location:</strong>
+                                    ${escapeHtml(
+                                        application.location || "Not provided"
+                                    )}
+                                </p>
+
+                                <p>
+                                    <strong>About:</strong>
+                                    ${escapeHtml(
+                                        application.bio || "Not provided"
+                                    )}
+                                </p>
+                            </div>
+
+                            <div class="proposal-message">
+                                <h5>Proposal</h5>
+                                <p>${escapeHtml(
+                                    application.proposal
+                                )}</p>
+                            </div>
+
+                            <p class="proposal-date">
+                                Submitted: ${escapeHtml(
+                                    application.createdAt
+                                        ? new Date(
+                                            application.createdAt
+                                        ).toLocaleString("en-IN")
+                                        : "Date unavailable"
+                                )}
+                            </p>
+                        </article>
+                    `).join("")}
+                </div>
+            `;
+        } catch (error) {
+            console.error("Proposal loading error:", error);
+
+            panel.innerHTML = `
+                <p class="proposal-error">
+                    ${escapeHtml(error.message)}
+                </p>
+                <button
+                    type="button"
+                    class="my-project-button retry-proposals-btn"
+                    data-project-id="${Number(projectId)}">
+                    Try Again
+                </button>
+            `;
+        }
+    }
+
     async function loadProjects() {
         list.innerHTML = "<p>Loading your projects...</p>";
 
@@ -41,10 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(
                 `${API_BASE}/projects/mine/${encodeURIComponent(user.id)}`
             );
+
             const projects = await response.json();
 
             if (!response.ok) {
-                throw new Error(projects.message || "Could not load projects.");
+                throw new Error(
+                    projects.message || "Could not load projects."
+                );
             }
 
             if (!Array.isArray(projects) || projects.length === 0) {
@@ -55,86 +198,144 @@ document.addEventListener("DOMContentLoaded", () => {
                         <a class="secondary-action" href="post-project.html">
                             Post a Project
                         </a>
-                    </div>`;
+                    </div>
+                `;
                 return;
             }
 
-            
+            list.innerHTML = projects.map(project => `
+                <article class="my-project-card">
+                    <h2>${escapeHtml(project.title)}</h2>
 
-list.innerHTML = projects.map(project => `
-    <article class="my-project-card">
-        <h2>${escapeHtml(project.title)}</h2>
+                    <span class="my-project-category">
+                        ${escapeHtml(
+                            project.category || "Uncategorised"
+                        )}
+                    </span>
 
-        <span class="my-project-category">
-            ${escapeHtml(project.category || "Uncategorised")}
-        </span>
+                    <p class="my-project-description">
+                        ${escapeHtml(
+                            project.description || "No description provided."
+                        )}
+                    </p>
 
-        <p class="my-project-description">${escapeHtml(
-            project.description || "No description provided."
-        )}</p>
+                    <div class="my-project-meta">
+                        <span>
+                            Budget
+                            <strong>${formatMoney(project.budget)}</strong>
+                        </span>
 
-        <div class="my-project-meta">
-            <span>
-                Budget
-                <strong>${
-                    project.budget == null
-                        ? "Not specified"
-                        : "₹" + Number(project.budget).toLocaleString("en-IN")
-                }</strong>
-            </span>
+                        <span>
+                            Deadline
+                            <strong>${escapeHtml(
+                                project.deadline
+                                    ? String(project.deadline).slice(0, 10)
+                                    : "Not specified"
+                            )}</strong>
+                        </span>
+                    </div>
 
-            <span>
-                Deadline
-                <strong>${
-                    project.deadline
-                        ? escapeHtml(String(project.deadline).slice(0, 10))
-                        : "Not specified"
-                }</strong>
-            </span>
-        </div>
+                    <span class="my-project-status ${
+                        project.status === "published"
+                            ? "published"
+                            : "closed"
+                    }">
+                        ${escapeHtml(project.status)}
+                    </span>
 
-        <span class="my-project-status ${
-            project.status === "published" ? "published" : "closed"
-        }">
-            ${escapeHtml(project.status)}
-        </span>
+                    <button
+                        type="button"
+                        class="my-project-button view-proposals-btn"
+                        data-project-id="${Number(project.id)}"
+                        aria-expanded="false">
+                        View Proposals
+                    </button>
 
-        ${
-            project.status === "published"
-                ? `<button
-                    class="my-project-button close-project-btn"
-                    data-project-id="${Number(project.id)}"
-                    type="button">
-                    Close Project
-                </button>`
-                : `<span class="my-project-button secondary">
-                    Project Closed
-                </span>`
-        }
-    </article>
-`).join("");
+                    ${
+                        project.status === "published"
+                            ? `<button
+                                class="my-project-button close-project-btn"
+                                data-project-id="${Number(project.id)}"
+                                type="button">
+                                Close Project
+                            </button>`
+                            : `<span class="my-project-button secondary">
+                                Project Closed
+                            </span>`
+                    }
 
-
+                    <section
+                        class="project-proposals-panel"
+                        id="proposals-${Number(project.id)}"
+                        hidden>
+                    </section>
+                </article>
+            `).join("");
 
         } catch (error) {
             console.error(error);
             message.textContent =
+                error.message ||
                 "Couldn't load projects. Check that the backend is running.";
             list.innerHTML = "";
         }
     }
 
     list.addEventListener("click", async event => {
-        const button = event.target.closest(".close-project-btn");
-        if (!button) return;
+        const viewButton = event.target.closest(".view-proposals-btn");
 
-        const projectId = button.dataset.projectId;
+        if (viewButton) {
+            const projectId = Number(viewButton.dataset.projectId);
+            const panel = document.getElementById(
+                `proposals-${projectId}`
+            );
+
+            if (!panel) return;
+
+            const isExpanded =
+                viewButton.getAttribute("aria-expanded") === "true";
+
+            panel.hidden = isExpanded;
+            viewButton.setAttribute(
+                "aria-expanded",
+                String(!isExpanded)
+            );
+
+            if (isExpanded) {
+                viewButton.textContent = "View Proposals";
+                return;
+            }
+
+            viewButton.textContent = "Hide Proposals";
+            await loadProposals(projectId, panel);
+            return;
+        }
+
+        const retryButton = event.target.closest(".retry-proposals-btn");
+
+        if (retryButton) {
+            const projectId = Number(retryButton.dataset.projectId);
+            const panel = document.getElementById(
+                `proposals-${projectId}`
+            );
+
+            if (panel) {
+                await loadProposals(projectId, panel);
+            }
+            return;
+        }
+
+        const closeButton = event.target.closest(".close-project-btn");
+
+        if (!closeButton) return;
+
+        const projectId = closeButton.dataset.projectId;
 
         if (!confirm("Are you sure you want to close this project?")) {
             return;
         }
 
-        button.disabled = true;
+        closeButton.disabled = true;
         message.textContent = "";
 
         try {
@@ -142,15 +343,21 @@ list.innerHTML = projects.map(project => `
                 `${API_BASE}/projects/${encodeURIComponent(projectId)}/close`,
                 {
                     method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ businessId: user.id })
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        businessId: user.id
+                    })
                 }
             );
 
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || "Could not close project.");
+                throw new Error(
+                    result.message || "Could not close project."
+                );
             }
 
             message.textContent = result.message;
@@ -158,7 +365,7 @@ list.innerHTML = projects.map(project => `
 
         } catch (error) {
             message.textContent = error.message;
-            button.disabled = false;
+            closeButton.disabled = false;
         }
     });
 
