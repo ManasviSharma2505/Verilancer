@@ -232,6 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    
     // 8. Sidebar navigation
     const sidebarLinks = document.querySelectorAll(
         ".sidebar-nav .sidebar-link"
@@ -241,21 +242,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const label = link.querySelector("span")?.textContent.trim() || "";
         const normalizedLabel = label.toLowerCase();
 
-        if (
-            normalizedLabel.includes("find projects") ||
-            normalizedLabel.includes("my projects")
-        ) {
+        if (normalizedLabel.includes("find projects")) {
             link.addEventListener("click", function (event) {
                 event.preventDefault();
-                openMarketplace();
-
-                const sidebar = document.querySelector(".sidebar");
-                if (sidebar) sidebar.classList.remove("mobile-open");
+                window.location.href = "projects.html";
+            });
+        } else if (normalizedLabel.includes("my projects")) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                window.location.href = "my-projects.html";
             });
         } else if (link.getAttribute("href") === "#") {
             link.addEventListener("click", function (event) {
                 event.preventDefault();
-
                 showComingSoon(label || "This section");
 
                 const sidebar = document.querySelector(".sidebar");

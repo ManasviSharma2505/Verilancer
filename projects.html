@@ -5,42 +5,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Projects | Verilancer</title>
+
     <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="css/browse-projects.css">
+
     <script src="js/marketplace.js" defer></script>
 </head>
-<body>
-    <header class="market-header">
-        <a class="brand" href="index.html">Verilancer<span>.</span></a>
-        <nav>
+
+<body class="browse-projects-page">
+
+    <header class="browse-header">
+        <a href="dashboard.html" class="browse-brand">
+            Verilancer<span>.</span>
+        </a>
+
+        <nav class="browse-nav" aria-label="Main navigation">
             <a href="dashboard.html">Dashboard</a>
             <a href="projects.html" aria-current="page">Browse Projects</a>
+            <a href="my-projects.html">My Projects</a>
+            <a href="post-project.html" class="browse-nav-cta">
+                Post a Project <span aria-hidden="true">↗</span>
+            </a>
         </nav>
     </header>
 
-    <main class="page-container">
-        <a class="back-link" href="dashboard.html">← Back to dashboard</a>
+    <main class="browse-container">
 
-        <section class="market-intro">
-            <p class="eyebrow">OPPORTUNITIES THAT MOVE YOU FORWARD</p>
-            <h1>Find Your Next Project</h1>
-            <p class="muted">Explore opportunities posted by businesses on Verilancer.</p>
+        <section class="browse-intro">
+            <p class="browse-eyebrow">
+                <span class="eyebrow-line"></span>
+                OPPORTUNITIES THAT MOVE YOU FORWARD
+            </p>
+
+            <div class="browse-intro-row">
+                <div>
+                    <h1>
+                        Find work that<br>
+                        <span>moves you forward.</span>
+                    </h1>
+
+                    <p class="browse-subtitle">
+                        Explore real opportunities from businesses and
+                        find a project that fits your skills.
+                    </p>
+                </div>
+
+                <a href="post-project.html" class="browse-post-link">
+                    Post a project <span aria-hidden="true">↗</span>
+                </a>
+            </div>
         </section>
 
-        <div class="project-toolbar">
-            <input id="projectSearch" type="search"
-                placeholder="Search by title, category or skill..."
-                aria-label="Search projects">
-            <button id="refreshProjects" class="secondary-btn" type="button">
-                Refresh
-            </button>
-        </div>
+        <section class="browse-discovery" aria-label="Find projects">
 
-        <p id="projectsMessage" class="form-message" role="status">
-            Loading projects...
-        </p>
+            <div class="browse-discovery-copy">
+                <span class="browse-discovery-icon" aria-hidden="true">
+                    ⌕
+                </span>
 
-        <section id="projectsList" class="projects-grid"
-            aria-live="polite"></section>
+                <div>
+                    <h2>Explore opportunities</h2>
+                    <p>Search by project, category, or skill.</p>
+                </div>
+            </div>
+
+            <div class="project-toolbar browse-toolbar">
+                <label class="browse-search-wrap" for="projectSearch">
+                    <span aria-hidden="true">⌕</span>
+
+                    <input
+                        id="projectSearch"
+                        type="search"
+                        placeholder="Try “web design” or “Python”..."
+                        aria-label="Search projects"
+                    >
+                </label>
+
+                <button
+                    id="refreshProjects"
+                    class="browse-refresh-btn"
+                    type="button"
+                >
+                    <span aria-hidden="true">↻</span>
+                    Refresh
+                </button>
+            </div>
+
+        </section>
+
+        <section class="browse-results" aria-label="Available projects">
+
+            <div class="browse-results-heading">
+                <h2>Available projects</h2>
+
+                <p
+                    id="projectsMessage"
+                    class="form-message"
+                    role="status"
+                    aria-live="polite"
+                >
+                    Loading projects...
+                </p>
+            </div>
+
+            <div
+                id="projectsList"
+                class="projects-grid browse-projects-grid"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+        <footer class="browse-footer">
+            <span class="browse-footer-brand">
+                Verilancer<span>.</span>
+            </span>
+
+            <p>Ideas deserve people who believe in them.</p>
+        </footer>
+
     </main>
+
 </body>
 </html>

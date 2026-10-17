@@ -350,6 +350,53 @@ app.get("/api/projects/mine/:businessId", (req, res) => {
 });
 
 
+
+/* =====================================
+   CLOSE PROJECT API
+===================================== */
+
+app.patch("/api/projects/:projectId/close", (req, res) => {
+    const { projectId } = req.params;
+    const { businessId } = req.body;
+
+    if (!Number.isInteger(Number(projectId)) ||
+        Number(projectId) <= 0 ||
+        !Number.isInteger(Number(businessId)) ||
+        Number(businessId) <= 0) {
+        return res.status(400).json({
+            message: "Valid project and business IDs are required."
+        });
+    }
+
+    const sql = `
+        UPDATE projects
+        SET status = 'closed'
+        WHERE id = ?
+          AND business_id = ?
+          AND status = 'published'
+    `;
+
+    db.query(sql, [Number(projectId), Number(businessId)], (err, result) => {
+        if (err) {
+            console.error("Close project error:", err);
+            return res.status(500).json({
+                message: "Unable to close project."
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Project not found, already closed, or not owned by this business."
+            });
+        }
+
+        return res.json({
+            message: "Project closed successfully."
+        });
+    });
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
