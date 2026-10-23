@@ -102,12 +102,16 @@ if (postRequirementCard) {
         if (!recentProjectsList) return;
 
         try {
-            const endpoint = isBusiness
-                ? `http://localhost:5001/api/projects/mine/${encodeURIComponent(user.id)}`
-                : "http://localhost:5001/api/projects";
+            
+const API_BASE = "https://verilancer-backend.onrender.com/api";
 
-            const response = await fetch(endpoint);
-            const projects = await response.json();
+const endpoint = isBusiness
+    ? `${API_BASE}/projects/mine/${encodeURIComponent(user.id)}`
+    : `${API_BASE}/projects`;
+
+const response = await fetch(endpoint);
+const projects = await response.json();
+
 
             if (!response.ok) {
                 throw new Error(projects.message || "Unable to load projects.");

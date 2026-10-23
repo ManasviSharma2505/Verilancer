@@ -17,7 +17,7 @@
 
         <div class="logo">
             <a href="index.html">
-                <img src="images/logo verilancer.jpeg" alt="Verilancer Logo">
+                <img src="images/verilancer-logo-transparent.png" alt="Verilancer Logo">
             </a>
         </div>
 
@@ -1164,11 +1164,11 @@
                 ecosystem built for collaboration, innovation, and growth.
             </p>
 
-            <a href="mailto:hello@verilancer.com" class="footer-email">
+            <a href="mailto:verilancerplatform@gmail.com" class="footer-email">
 
                 <i class="fa-regular fa-envelope"></i>
 
-                hello@verilancer.com
+                verilancerplatform@gmail.com
 
             </a>
 
@@ -1287,6 +1287,31 @@
 <script>
     lucide.createIcons();
 </script>    
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const navbar = document.querySelector(".navbar");
+
+    if (!navbar) return;
+
+    let scrollTimeout;
+
+    function updateNavbar() {
+        clearTimeout(scrollTimeout);
+
+        if (window.scrollY <= 5) {
+            navbar.classList.remove("navbar-hidden");
+        } else {
+            scrollTimeout = setTimeout(() => {
+                navbar.classList.add("navbar-hidden");
+            }, 250);
+        }
+    }
+
+    window.addEventListener("scroll", updateNavbar, { passive: true });
+    updateNavbar();
+});
+</script>
 
 </body>
 </html>
