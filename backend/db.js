@@ -1,14 +1,15 @@
+
 const mysql = require("mysql2");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT
+    database: process.env.DB_NAME || "verilancer",
+    port: Number(process.env.DB_PORT || 3306)
 });
 
 db.connect((err) => {
@@ -17,7 +18,7 @@ db.connect((err) => {
         return;
     }
 
-    console.log("MySQL connected successfully!");
+    console.log("Local MySQL connected successfully!");
 });
 
 module.exports = db;

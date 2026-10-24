@@ -173,6 +173,88 @@ app.get("/api/profile/:userId", (req, res) => {
 });
 
 
+
+app.put("/api/profile/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+    const { name, bio, skills, phone, location } = req.body;
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({
+            message: "Valid user ID is required."
+        });
+    }
+
+    if (!name || !name.trim()) {
+        return res.status(400).json({
+            message: "Name is required."
+        });
+    }
+
+    const updateUserSql = `
+        UPDATE users
+        SET name = ?
+        WHERE id = ?
+    `;
+
+    db.query(updateUserSql, [name.trim(), userId], (err, result) => {
+        if (err) {
+            console.error("Profile name update error:", err);
+
+            if (err.code === "ER_DUP_ENTRY") {
+                return res.status(409).json({
+                    message: "That name could not be saved."
+                });
+            }
+
+            return res.status(500).json({
+                message: "Unable to update profile."
+            });
+        }
+
+        if (result.affectedRows === 0) {
+        return res.status(404).json({
+        message: "User not found."
+    });
+}
+
+        const profileSql = `
+            INSERT INTO professional_profiles
+                (user_id, bio, skills, phone, location)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                bio = VALUES(bio),
+                skills = VALUES(skills),
+                phone = VALUES(phone),
+                location = VALUES(location)
+        `;
+
+        db.query(
+            profileSql,
+            [
+                userId,
+                bio || "",
+                skills || "",
+                phone || "",
+                location || ""
+            ],
+            (profileErr) => {
+                if (profileErr) {
+                    console.error("Profile details update error:", profileErr);
+
+                    return res.status(500).json({
+                        message: "Name was updated, but profile details could not be saved."
+                    });
+                }
+
+                return res.json({
+                    message: "Profile updated successfully."
+                });
+            }
+        );
+    });
+});
+
+
 /* =====================================
    PROJECT MARKETPLACE API
 ===================================== */

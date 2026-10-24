@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>My Profile | Verilancer</title>
+</head>
+<body>
+
+    <main class="profile-container">
+        <a href="dashboard.html" class="profile-back">
+            ← Back to Dashboard
+        </a>
+
+        <section class="profile-card">
+            <h1>My Profile</h1>
+            <p>Keep your Verilancer profile up to date.</p>
+
+            <form id="profileForm">
+                <label for="profileName">Full Name</label>
+                <input type="text" id="profileName" required maxlength="100">
+
+                <label for="profileEmail">Email Address</label>
+                <input type="email" id="profileEmail" readonly>
+
+                <label for="profileBio">Bio</label>
+                <textarea id="profileBio" rows="4"
+                          placeholder="Tell us about yourself"></textarea>
+
+                <label for="profileSkills">Skills</label>
+                <textarea id="profileSkills" rows="3"
+                          placeholder="Enter skills separated by commas"></textarea>
+
+                <label for="profilePhone">Phone</label>
+                <input type="tel" id="profilePhone" maxlength="20">
+
+                <label for="profileLocation">Location</label>
+                <input type="text" id="profileLocation" maxlength="150"
+                       placeholder="City, State">
+
+                <p id="profileMessage" role="status"></p>
+
+                <button type="submit" id="saveProfileBtn">
+                    Save Changes
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script src="js/profile.js"></script>
+</body>
+</html>
