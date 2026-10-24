@@ -99,9 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    alert(data.message || "Login failed.");
-                    return;
-                }
+                console.error("Login failed:", response.status, data);
+                alert("Login error (" + response.status + "): " + (data.message || "Unknown error"));
+                return;
+            }
 
                 if (!data.user || !data.user.id) {
                     console.error("Unexpected login response:", data);

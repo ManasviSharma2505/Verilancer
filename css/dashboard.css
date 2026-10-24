@@ -796,3 +796,127 @@ button {
     border-radius: 7px;
     padding: 5px 9px;
 }
+
+
+/* ===== PROFILE PAGE ===== */
+
+.profile-container {
+    padding: 24px 0;
+    max-width: 100%;
+}
+
+.profile-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    color: #1f5fbf;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.profile-card {
+    background: #ffffff;
+    border: 1px solid #e8edf4;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 850px;
+    box-shadow: 0 4px 18px rgba(31, 95, 191, 0.05);
+}
+
+.profile-card h2 {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.profile-card > p {
+    margin: 0 0 28px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+#profileForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#profileForm label {
+    display: block;
+    margin-top: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#profileForm input,
+#profileForm textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d9e1ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1f2937;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+#profileForm input:focus,
+#profileForm textarea:focus {
+    border-color: #2d7ff9;
+}
+
+#profileForm input[readonly] {
+    background: #f5f7fa;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+#profileForm textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+#saveProfileBtn {
+    align-self: flex-start;
+    margin-top: 12px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background: #1f5fbf;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#saveProfileBtn:hover {
+    background: #194f9f;
+}
+
+#profileMessage {
+    font-size: 14px;
+    color: #1f5fbf;
+}
+
+@media (max-width: 600px) {
+    .profile-card {
+        padding: 20px;
+    }
+
+    .profile-card h2 {
+        font-size: 21px;
+    }
+
+    #saveProfileBtn {
+        width: 100%;
+    }
+}

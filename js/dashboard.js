@@ -224,9 +224,8 @@ const projects = await response.json();
             event.preventDefault();
 
             if (index === 0) {
-                // Profile is not connected yet
-                showComingSoon("Profile");
-                return;
+            window.location.href = "profile.html";
+            return;
             }
 
             if (index === 1) {
