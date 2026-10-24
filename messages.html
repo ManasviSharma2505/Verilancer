@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | Verilancer</title>
+    <link rel="icon" href="images/verilancer-logo-transparent.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/messages.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <a href="index.html">
+                <img src="images/verilancer-logo-transparent.png" alt="Verilancer Logo">
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="sidebar-link">
+                <i class="fa-solid fa-grid-2"></i><span>Dashboard</span>
+            </a>
+            <a href="projects.html" class="sidebar-link">
+                <i class="fa-solid fa-magnifying-glass"></i><span>Find Projects</span>
+            </a>
+            <a href="my-projects.html" class="sidebar-link">
+                <i class="fa-solid fa-folder-open"></i><span>My Projects</span>
+            </a>
+            <a href="messages.html" class="sidebar-link active">
+                <i class="fa-regular fa-message"></i><span>Messages</span>
+            </a>
+            <a href="profile.html" class="sidebar-link">
+                <i class="fa-regular fa-user"></i><span>Profile</span>
+            </a>
+            <a href="#" class="sidebar-link" id="paymentsLink">
+                <i class="fa-solid fa-wallet"></i><span>Payments</span>
+            </a>
+            <a href="settings.html" class="sidebar-link">
+                <i class="fa-solid fa-gear"></i><span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="index.html" class="sidebar-link">
+                <i class="fa-solid fa-house"></i><span>Back to Website</span>
+            </a>
+            <a href="#" class="sidebar-link logout-link" data-dashboard-logout>
+                <i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="dashboard-main messages-main">
+        <header class="dashboard-header">
+            <div class="mobile-menu">
+                <button id="mobileMenuBtn" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div>
+                <h1>Messages</h1>
+                <p>Conversations connected to your project applications.</p>
+            </div>
+            <div class="messages-user">
+                <span id="messagesAvatar">U</span>
+                <div>
+                    <strong id="messagesUserName">User</strong>
+                    <small id="messagesUserRole">Account</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="messages-layout">
+            <aside class="conversation-panel">
+                <div class="conversation-heading">
+                    <h2>Conversations</h2>
+                    <button id="refreshConversations" title="Refresh conversations" aria-label="Refresh conversations">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+                <div id="conversationList" class="conversation-list">
+                    <p class="messages-state">Loading conversations...</p>
+                </div>
+            </aside>
+
+            <section class="chat-panel">
+                <div id="chatEmpty" class="chat-empty">
+                    <div class="chat-empty-icon"><i class="fa-regular fa-comments"></i></div>
+                    <h2>Your conversations</h2>
+                    <p>Select a conversation to view messages and reply.</p>
+                </div>
+
+                <div id="activeChat" class="active-chat" hidden>
+                    <header class="chat-header">
+                        <div class="chat-person-avatar" id="chatAvatar">U</div>
+                        <div>
+                            <h2 id="chatPersonName">Contact</h2>
+                            <p id="chatProjectName">Project</p>
+                        </div>
+                        <span id="applicationStatus" class="application-status"></span>
+                    </header>
+
+                    <div id="messageList" class="message-list" aria-live="polite">
+                        <p class="messages-state">Loading messages...</p>
+                    </div>
+
+                    <form id="messageForm" class="message-form">
+                        <textarea id="messageInput" maxlength="5000" rows="1" placeholder="Write a message..." aria-label="Message" required></textarea>
+                        <button id="sendMessageBtn" type="submit" aria-label="Send message">
+                            <i class="fa-solid fa-paper-plane"></i><span>Send</span>
+                        </button>
+                    </form>
+                    <p id="messageFeedback" class="message-feedback" role="status"></p>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script src="js/messages.js"></script>
+</body>
+</html>

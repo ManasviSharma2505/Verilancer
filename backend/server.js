@@ -8,6 +8,11 @@ const app = express();
 app.use(cors());
 const PORT = 5001;
 
+app.use((req, res, next) => {
+    console.log("REQUEST RECEIVED:", req.method, req.url);
+    next();
+});
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -65,7 +70,10 @@ app.post("/api/signup", async (req, res) => {
     }
 });
 
-app.post("/api/login", async (req, res) => {
+
+app.post("/api/login", (req, res) => {
+    console.log("LOGIN REQUEST RECEIVED");
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -82,10 +90,9 @@ app.post("/api/login", async (req, res) => {
 
     db.query(sql, [email], async (err, results) => {
         if (err) {
-            console.error("Login error:", err);
-
+            console.error("LOGIN DATABASE ERROR:", err);
             return res.status(500).json({
-                message: "Login failed."
+                message: "Database query failed."
             });
         }
 
@@ -95,10 +102,9 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
-        const user = results[0];
-
         try {
-            // Compare entered password with the stored bcrypt hash
+            const user = results[0];
+
             const isPasswordCorrect = await bcrypt.compare(
                 password,
                 user.password
@@ -110,7 +116,9 @@ app.post("/api/login", async (req, res) => {
                 });
             }
 
-            res.status(200).json({
+            console.log("LOGIN SUCCESS:", user.email);
+
+            return res.status(200).json({
                 message: "Login successful!",
                 user: {
                     id: user.id,
@@ -120,14 +128,15 @@ app.post("/api/login", async (req, res) => {
                 }
             });
         } catch (error) {
-            console.error("Password verification error:", error);
+            console.error("LOGIN PASSWORD ERROR:", error);
 
-            res.status(500).json({
-                message: "Login failed."
+            return res.status(500).json({
+                message: "Password verification failed."
             });
         }
     });
 });
+
 
 app.get("/api/test", (req, res) => {
     res.json({ message: "API routes are working" });
@@ -135,18 +144,31 @@ app.get("/api/test", (req, res) => {
 
 
 
+
 app.get("/api/profile/:userId", (req, res) => {
-    const { userId } = req.params;
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({
+            message: "Valid user ID is required."
+        });
+    }
 
     const sql = `
-        SELECT 
+        SELECT
             u.name,
             u.email,
             u.role,
             p.bio,
             p.skills,
             p.phone,
-            p.location
+            p.location,
+            p.headline,
+            p.portfolio,
+            p.experience,
+            p.education,
+            p.certifications,
+            p.availability
         FROM users u
         LEFT JOIN professional_profiles p
             ON u.id = p.user_id
@@ -156,7 +178,6 @@ app.get("/api/profile/:userId", (req, res) => {
     db.query(sql, [userId], (err, results) => {
         if (err) {
             console.error("Profile fetch error:", err);
-
             return res.status(500).json({
                 message: "Failed to fetch profile."
             });
@@ -174,9 +195,23 @@ app.get("/api/profile/:userId", (req, res) => {
 
 
 
+
 app.put("/api/profile/:userId", (req, res) => {
     const userId = Number(req.params.userId);
-    const { name, bio, skills, phone, location } = req.body;
+
+    const {
+        name,
+        bio,
+        skills,
+        phone,
+        location,
+        headline,
+        portfolio,
+        experience,
+        education,
+        certifications,
+        availability
+    } = req.body;
 
     if (!Number.isInteger(userId) || userId <= 0) {
         return res.status(400).json({
@@ -184,7 +219,7 @@ app.put("/api/profile/:userId", (req, res) => {
         });
     }
 
-    if (!name || !name.trim()) {
+    if (typeof name !== "string" || !name.trim()) {
         return res.status(400).json({
             message: "Name is required."
         });
@@ -199,33 +234,43 @@ app.put("/api/profile/:userId", (req, res) => {
     db.query(updateUserSql, [name.trim(), userId], (err, result) => {
         if (err) {
             console.error("Profile name update error:", err);
-
-            if (err.code === "ER_DUP_ENTRY") {
-                return res.status(409).json({
-                    message: "That name could not be saved."
-                });
-            }
-
             return res.status(500).json({
                 message: "Unable to update profile."
             });
         }
 
         if (result.affectedRows === 0) {
-        return res.status(404).json({
-        message: "User not found."
-    });
-}
+            return res.status(404).json({
+                message: "User not found."
+            });
+        }
 
         const profileSql = `
-            INSERT INTO professional_profiles
-                (user_id, bio, skills, phone, location)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO professional_profiles (
+                user_id,
+                bio,
+                skills,
+                phone,
+                location,
+                headline,
+                portfolio,
+                experience,
+                education,
+                certifications,
+                availability
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
                 bio = VALUES(bio),
                 skills = VALUES(skills),
                 phone = VALUES(phone),
-                location = VALUES(location)
+                location = VALUES(location),
+                headline = VALUES(headline),
+                portfolio = VALUES(portfolio),
+                experience = VALUES(experience),
+                education = VALUES(education),
+                certifications = VALUES(certifications),
+                availability = VALUES(availability)
         `;
 
         db.query(
@@ -235,24 +280,30 @@ app.put("/api/profile/:userId", (req, res) => {
                 bio || "",
                 skills || "",
                 phone || "",
-                location || ""
+                location || "",
+                headline || "",
+                portfolio || "",
+                experience || "",
+                education || "",
+                certifications || "",
+                availability || ""
             ],
             (profileErr) => {
                 if (profileErr) {
                     console.error("Profile details update error:", profileErr);
-
                     return res.status(500).json({
                         message: "Name was updated, but profile details could not be saved."
                     });
                 }
 
-                return res.json({
+                res.json({
                     message: "Profile updated successfully."
                 });
             }
         );
     });
 });
+
 
 
 /* =====================================
@@ -785,6 +836,231 @@ app.get("/api/professional-profiles/:userId", (req, res) => {
 
         return res.json(rows[0]);
     });
+});
+
+
+/* =====================================
+   PROJECT MESSAGES API
+===================================== */
+
+// List conversations for a professional or business.
+app.get("/api/messages/conversations/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({ message: "Valid user ID required." });
+    }
+
+    const sql = `
+        SELECT
+            a.id AS applicationId,
+            p.id AS projectId,
+            p.title AS projectTitle,
+            a.status AS applicationStatus,
+            professional.id AS professionalId,
+            professional.name AS professionalName,
+            business.id AS businessId,
+            business.name AS businessName,
+            latest.message AS lastMessage,
+            latest.created_at AS lastMessageAt
+        FROM project_applications a
+        JOIN projects p ON p.id = a.project_id
+        JOIN users professional ON professional.id = a.professional_id
+        JOIN users business ON business.id = p.business_id
+        LEFT JOIN project_messages latest
+            ON latest.id = (
+                SELECT m.id
+                FROM project_messages m
+                WHERE m.application_id = a.id
+                ORDER BY m.created_at DESC, m.id DESC
+                LIMIT 1
+            )
+        WHERE a.professional_id = ?
+           OR p.business_id = ?
+        ORDER BY COALESCE(latest.created_at, a.created_at) DESC
+    `;
+
+    db.query(sql, [userId, userId], (err, rows) => {
+        if (err) {
+            console.error("Conversations error:", err);
+            return res.status(500).json({
+                message: "Unable to load conversations."
+            });
+        }
+
+        db.query(
+            "SELECT role FROM users WHERE id = ?",
+            [userId],
+            (userErr, users) => {
+                if (userErr) {
+                    return res.status(500).json({
+                        message: "Unable to verify account."
+                    });
+                }
+
+                if (!users.length) {
+                    return res.status(404).json({
+                        message: "Account not found."
+                    });
+                }
+
+                const role = users[0].role;
+
+                if (!["student", "client"].includes(role)) {
+                    return res.status(403).json({
+                        message: "Account type cannot access messages."
+                    });
+                }
+
+                const conversations = rows.filter(row =>
+                    role === "student"
+                        ? Number(row.professionalId) === userId
+                        : Number(row.businessId) === userId
+                );
+
+                return res.json(conversations);
+            }
+        );
+    });
+});
+
+
+// Load messages after verifying application participation.
+app.get("/api/messages/:applicationId", (req, res) => {
+    const applicationId = Number(req.params.applicationId);
+    const userId = Number(req.query.userId);
+
+    if (
+        !Number.isInteger(applicationId) || applicationId <= 0 ||
+        !Number.isInteger(userId) || userId <= 0
+    ) {
+        return res.status(400).json({
+            message: "Valid application and user IDs required."
+        });
+    }
+
+    const sql = `
+        SELECT
+            m.id,
+            m.application_id AS applicationId,
+            m.sender_id AS senderId,
+            m.message,
+            m.created_at AS createdAt,
+            u.name AS senderName
+        FROM project_messages m
+        JOIN users u ON u.id = m.sender_id
+        WHERE m.application_id = ?
+          AND EXISTS (
+              SELECT 1
+              FROM project_applications a
+              JOIN projects p ON p.id = a.project_id
+              WHERE a.id = m.application_id
+                AND (a.professional_id = ? OR p.business_id = ?)
+          )
+        ORDER BY m.created_at ASC, m.id ASC
+    `;
+
+    // Verify access even when the conversation has no messages yet.
+    db.query(
+        `SELECT a.id
+         FROM project_applications a
+         JOIN projects p ON p.id = a.project_id
+         WHERE a.id = ?
+           AND (a.professional_id = ? OR p.business_id = ?)`,
+        [applicationId, userId, userId],
+        (checkErr, access) => {
+            if (checkErr) {
+                console.error("Message access check error:", checkErr);
+                return res.status(500).json({
+                    message: "Unable to verify conversation access."
+                });
+            }
+
+            if (!access.length) {
+                return res.status(403).json({
+                    message: "You cannot access this conversation."
+                });
+            }
+
+            db.query(sql, [applicationId, userId, userId], (err, messages) => {
+                if (err) {
+                    console.error("Load messages error:", err);
+                    return res.status(500).json({
+                        message: "Unable to load messages."
+                    });
+                }
+
+                return res.json(messages);
+            });
+        }
+    );
+});
+
+
+// Send a message within an existing application conversation.
+app.post("/api/messages/:applicationId", (req, res) => {
+    const applicationId = Number(req.params.applicationId);
+    const senderId = Number(req.body.userId);
+    const message = typeof req.body.message === "string"
+        ? req.body.message.trim()
+        : "";
+
+    if (
+        !Number.isInteger(applicationId) || applicationId <= 0 ||
+        !Number.isInteger(senderId) || senderId <= 0 ||
+        !message || message.length > 5000
+    ) {
+        return res.status(400).json({
+            message: "Valid IDs and a message of 1–5000 characters are required."
+        });
+    }
+
+    const accessSql = `
+        SELECT a.id
+        FROM project_applications a
+        JOIN projects p ON p.id = a.project_id
+        WHERE a.id = ?
+          AND (a.professional_id = ? OR p.business_id = ?)
+    `;
+
+    db.query(
+        accessSql,
+        [applicationId, senderId, senderId],
+        (checkErr, rows) => {
+            if (checkErr) {
+                console.error("Send message access check error:", checkErr);
+                return res.status(500).json({
+                    message: "Unable to verify conversation access."
+                });
+            }
+
+            if (!rows.length) {
+                return res.status(403).json({
+                    message: "You cannot send messages in this conversation."
+                });
+            }
+
+            db.query(
+                `INSERT INTO project_messages
+                    (application_id, sender_id, message)
+                 VALUES (?, ?, ?)`,
+                [applicationId, senderId, message],
+                (insertErr, result) => {
+                    if (insertErr) {
+                        console.error("Send message error:", insertErr);
+                        return res.status(500).json({
+                            message: "Unable to send message."
+                        });
+                    }
+
+                    return res.status(201).json({
+                        message: "Message sent successfully.",
+                        id: result.insertId
+                    });
+                }
+            );
+        }
+    );
 });
 
 
