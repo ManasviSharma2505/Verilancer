@@ -539,12 +539,7 @@ projectsList.addEventListener("click", async event => {
                 <p>${escapeHtml(profile.skills || "Not added yet")}</p>
             </div>
 
-            <div class="application-profile-detail">
-                <span>LOCATION</span>
-                <p>${escapeHtml(profile.location || "Not added yet")}</p>
-            </div>
-
-            <div class="application-profile-detail">
+<div class="application-profile-detail">
                 <span>ABOUT</span>
                 <p>${escapeHtml(profile.bio || "No introduction added yet.")}</p>
             </div>
