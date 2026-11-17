@@ -1,0 +1,44 @@
+#myApplicationsList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+.application-card {
+    min-width: 0;
+    padding: 27px;
+    background: #fff;
+    border: 1px solid var(--mp-border);
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(26, 52, 37, .035);
+}
+.application-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+.application-category, .application-status {
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+.application-category { color: var(--mp-green-dark); background: var(--mp-green-light); }
+.application-status { color: #875b08; background: #fff3d9; }
+.application-status.accepted { color: #216b3c; background: #e4f5e9; }
+.application-status.rejected { color: #a33a35; background: #fbe8e7; }
+.application-card h2 { margin: 0 0 8px; font: 800 23px 'Manrope', sans-serif; overflow-wrap: anywhere; }
+.application-business { margin: 0 0 22px; color: var(--mp-muted); font-size: 13px; }
+.application-meta { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 15px; padding: 18px 0; border-top: 1px solid var(--mp-border); border-bottom: 1px solid var(--mp-border); }
+.application-meta span { display: flex; flex-direction: column; gap: 6px; color: var(--mp-muted); font-size: 11px; }
+.application-meta strong { color: var(--mp-ink); font-size: 14px; overflow-wrap: anywhere; }
+.application-proposal { margin-top: 20px; }
+.application-proposal h3 { margin: 0 0 8px; font: 700 14px 'Manrope', sans-serif; }
+.application-proposal p { margin: 0; color: #59665d; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.applications-empty { grid-column: 1 / -1; padding: 55px 24px; text-align: center; background: #fff; border: 1px dashed #d5dfd7; border-radius: 18px; }
+.applications-empty h2 { margin: 0 0 10px; font: 800 24px 'Manrope', sans-serif; }
+.applications-empty p { color: var(--mp-muted); font-size: 14px; }
+.applications-empty a { display: inline-flex; margin-top: 15px; padding: 12px 18px; color: #fff; background: var(--mp-green); border-radius: 9px; font-size: 13px; font-weight: 700; text-decoration: none; }
+@media (max-width: 760px) { #myApplicationsList { grid-template-columns: 1fr; } .application-card { padding: 22px; } }
