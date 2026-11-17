@@ -584,6 +584,8 @@ body{
 
     opacity:.14;
 
+    transform:rotate(-8deg) scale(1.08);
+
     pointer-events:none;
 }
 
