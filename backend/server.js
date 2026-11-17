@@ -72,6 +72,18 @@ db.query(`
     )
 `, err => { if (err) console.error("Notification preferences table:", err.message); });
 
+db.query("SHOW COLUMNS FROM notification_preferences LIKE 'message_updates'", (columnError, columns) => {
+    if (columnError) {
+        console.error("Check message notification preference column:", columnError.message);
+        return;
+    }
+    if (!columns.length) {
+        db.query("ALTER TABLE notification_preferences ADD COLUMN message_updates TINYINT(1) NOT NULL DEFAULT 1", alterError => {
+            if (alterError) console.error("Add message notification preference column:", alterError.message);
+        });
+    }
+});
+
 db.query(`
     CREATE TABLE IF NOT EXISTS notifications (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,6 +98,29 @@ db.query(`
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
 `, err => { if (err) console.error("Notifications table:", err.message); });
+
+function createMessageNotification(userId, title, message, applicationId) {
+    db.query(
+        "SELECT message_updates FROM notification_preferences WHERE user_id = ?",
+        [userId],
+        (preferenceError, rows) => {
+            if (preferenceError) {
+                console.error("Message notification preference lookup:", preferenceError.message);
+                return;
+            }
+            if (rows.length && Number(rows[0].message_updates) === 0) return;
+            db.query(
+                `INSERT INTO notifications
+                    (user_id, type, title, message, related_application_id)
+                 VALUES (?, 'message_received', ?, ?, ?)`,
+                [userId, title, message, applicationId || null],
+                insertError => {
+                    if (insertError) console.error("Create message notification:", insertError.message);
+                }
+            );
+        }
+    );
+}
 
 function createProjectNotification(userId, type, title, message, applicationId) {
     db.query(
@@ -117,20 +152,23 @@ function createProjectNotification(userId, type, title, message, applicationId) 
 app.put("/api/notification-preferences/:userId", (req, res) => {
     const userId = Number(req.params.userId);
     const enabled = req.body.projectUpdates;
-    if (!Number.isInteger(userId) || userId <= 0 || typeof enabled !== "boolean") {
+    const messageEnabled = req.body.messageUpdates;
+    if (!Number.isInteger(userId) || userId <= 0 || typeof enabled !== "boolean" || typeof messageEnabled !== "boolean") {
         return res.status(400).json({ message: "A valid user ID and boolean preference are required." });
     }
     db.query(
-        `INSERT INTO notification_preferences (user_id, project_updates)
-         VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE project_updates = VALUES(project_updates)`,
-        [userId, enabled ? 1 : 0],
+        `INSERT INTO notification_preferences (user_id, project_updates, message_updates)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+            project_updates = VALUES(project_updates),
+            message_updates = VALUES(message_updates)`,
+        [userId, enabled ? 1 : 0, messageEnabled ? 1 : 0],
         err => {
             if (err) {
                 console.error("Save notification preference:", err);
                 return res.status(500).json({ message: "Unable to save notification preference." });
             }
-            return res.json({ message: "Notification preference saved.", projectUpdates: enabled });
+            return res.json({ message: "Notification preferences saved.", projectUpdates: enabled, messageUpdates: messageEnabled });
         }
     );
 });
@@ -1221,7 +1259,8 @@ app.post("/api/messages/:applicationId", (req, res) => {
     }
 
     const accessSql = `
-        SELECT a.id
+        SELECT a.id, a.professional_id AS professionalId,
+               p.business_id AS businessId, p.title AS projectTitle
         FROM project_applications a
         JOIN projects p ON p.id = a.project_id
         WHERE a.id = ?
@@ -1286,6 +1325,20 @@ app.post("/api/messages/:applicationId", (req, res) => {
         io.to(`application_${applicationId}`).emit(
             "newMessage",
             savedMessage
+        );
+
+        const conversation = rows[0];
+        const recipientId = Number(senderId) === Number(conversation.professionalId)
+            ? Number(conversation.businessId)
+            : Number(conversation.professionalId);
+        const messagePreview = savedMessage.message.length > 120
+            ? savedMessage.message.slice(0, 117) + "..."
+            : savedMessage.message;
+        createMessageNotification(
+            recipientId,
+            `New message from ${savedMessage.senderName || "your contact"}`,
+            messagePreview,
+            applicationId
         );
 
         return res.status(201).json({
