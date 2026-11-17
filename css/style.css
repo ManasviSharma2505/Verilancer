@@ -2533,22 +2533,17 @@ max-width:100%;
         BRAND
 =========================== */
 
-.footer-logo{
-
-    font-size:38px;
-    font-weight:800;
-    letter-spacing:-1px;
-
-    color:#ffffff;
-
+.footer-logo-link{
+    display:inline-flex;
+    align-items:center;
     margin-bottom:24px;
-
 }
 
-.footer-logo span{
-
-    color:#2D7FF9;
-
+.footer-logo-image{
+    display:block;
+    width:118px;
+    height:118px;
+    object-fit:contain;
 }
 
 .footer-brand h2{
