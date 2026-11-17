@@ -207,7 +207,7 @@ function updatePreview() {
     const name = fields.name.value.trim() || "Your Name";
     const headline = fields.headline.value.trim() ||
         "Add your professional headline";
-    const location = fields.location.value.trim() || "Add your location";
+    const location = "Location kept private";
 
     display.name.textContent = name;
     display.headline.textContent = headline;
@@ -285,8 +285,12 @@ async function loadProfile() {
         fields.certifications.value = data.certifications || "";
         fields.availability.value = data.availability || "";
 
-        document.getElementById("headerUserRole").textContent =
-            data.role === "client" ? "Business" : "Professional";
+        if (data.role === "client") {
+            window.location.replace("business-profile.html");
+            return;
+        }
+
+        document.getElementById("headerUserRole").textContent = "Professional";
 
         savedProfile = Boolean(
             data.bio ||
