@@ -707,6 +707,7 @@ app.get("/api/applications/mine/:professionalId", (req, res) => {
                     a.id AS applicationId,
                     a.project_id AS projectId,
                     a.proposal,
+                    a.bid_amount AS bidAmount,
                     a.status AS applicationStatus,
                     a.created_at AS appliedAt,
                     p.title,
