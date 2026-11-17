@@ -87,11 +87,85 @@ if (postRequirementCard) {
         isBusiness ? "Post a Requirement" : "Explore Projects"
     );
 
-    // 5. Demo overview data (replace with backend data later)
-    setText("activeProjects", "0");
-    setText("completedProjects", "0");
-    setText("totalEarnings", "₹0");
-    setText("pendingPayments", "₹0");
+    // 5. Load live dashboard statistics from the local API.
+    const API_BASE = "http://localhost:5001/api";
+
+    async function loadDashboardStats() {
+        try {
+            if (isBusiness) {
+                setText("statLabelOne", "Published Projects");
+                setText("statLabelTwo", "Closed Projects");
+                setText("statLabelThree", "Proposals Received");
+                setText("statLabelFour", "Pending Proposals");
+
+                const response = await fetch(
+                    `${API_BASE}/projects/mine/${encodeURIComponent(user.id)}`
+                );
+                const projects = await response.json();
+
+                if (!response.ok || !Array.isArray(projects)) {
+                    throw new Error(projects.message || "Unable to load business statistics.");
+                }
+
+                let proposalCount = 0;
+                let pendingCount = 0;
+
+                await Promise.all(projects.map(async project => {
+                    const proposalResponse = await fetch(
+                        `${API_BASE}/projects/${encodeURIComponent(project.id)}/applications?businessId=${encodeURIComponent(user.id)}`
+                    );
+                    const proposals = await proposalResponse.json();
+
+                    if (!proposalResponse.ok || !Array.isArray(proposals)) {
+                        throw new Error(proposals.message || "Unable to load proposal statistics.");
+                    }
+
+                    proposalCount += proposals.length;
+                    pendingCount += proposals.filter(item =>
+                        String(item.status).toLowerCase() === "pending"
+                    ).length;
+                }));
+
+                setText("activeProjects", projects.filter(project =>
+                    String(project.status).toLowerCase() === "published"
+                ).length);
+                setText("completedProjects", projects.filter(project =>
+                    String(project.status).toLowerCase() === "closed"
+                ).length);
+                setText("totalEarnings", proposalCount);
+                setText("pendingPayments", pendingCount);
+            } else {
+                setText("statLabelOne", "Applications Sent");
+                setText("statLabelTwo", "Accepted Bids");
+                setText("statLabelThree", "Pending Responses");
+                setText("statLabelFour", "Rejected Bids");
+
+                const response = await fetch(
+                    `${API_BASE}/applications/mine/${encodeURIComponent(user.id)}`
+                );
+                const applications = await response.json();
+
+                if (!response.ok || !Array.isArray(applications)) {
+                    throw new Error(applications.message || "Unable to load application statistics.");
+                }
+
+                const statuses = applications.map(item =>
+                    String(item.applicationStatus || "pending").toLowerCase()
+                );
+
+                setText("activeProjects", applications.length);
+                setText("completedProjects", statuses.filter(status => status === "accepted").length);
+                setText("totalEarnings", statuses.filter(status => status === "pending").length);
+                setText("pendingPayments", statuses.filter(status => status === "rejected").length);
+            }
+        } catch (error) {
+            console.error("Dashboard statistics error:", error);
+            ["activeProjects", "completedProjects", "totalEarnings", "pendingPayments"]
+                .forEach(id => setText(id, "—"));
+        }
+    }
+
+    loadDashboardStats();
 
     
     // Load real projects into the Recent Projects dashboard card
@@ -103,13 +177,11 @@ if (postRequirementCard) {
 
         try {
             
-const API_BASE = "https://verilancer-backend.onrender.com/api";
-
 const endpoint = isBusiness
     ? `${API_BASE}/projects/mine/${encodeURIComponent(user.id)}`
     : `${API_BASE}/projects`;
 
-const response = await fetch(endpoint);
+const response = await fetch(endpoint.replace("https://verilancer-backend.onrender.com/api", API_BASE));
 const projects = await response.json();
 
 
