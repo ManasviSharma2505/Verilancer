@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications | Verilancer</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="css/my-projects.css">
+    <link rel="stylesheet" href="css/applications.css">
+</head>
+<body class="my-projects-page">
+    <header class="my-projects-header">
+        <a href="dashboard.html" class="my-projects-brand" aria-label="Verilancer home">
+            <img src="images/verilancer-logo-transparent.png" alt="Verilancer">
+        </a>
+        <nav class="my-projects-nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="projects.html">Find Projects</a>
+            <a href="messages.html">Messages</a>
+        </nav>
+    </header>
+
+    <main class="my-projects-container">
+        <section class="my-projects-intro">
+            <p>YOUR PROFESSIONAL WORKSPACE</p>
+            <h1>My Applications</h1>
+            <p>Track the proposals you've sent and see where each opportunity stands.</p>
+        </section>
+        <p id="applicationsMessage" role="status" aria-live="polite"></p>
+        <section id="myApplicationsList" aria-live="polite">
+            <p>Loading your applications...</p>
+        </section>
+    </main>
+
+    <script src="js/applications.js"></script>
+    <script src="js/role-access.js"></script>
+</body>
+</html>
