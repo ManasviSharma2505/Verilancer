@@ -39,11 +39,15 @@
     <span>Find Projects</span>
 </a>
 
-<a href="my-projects.html" class="sidebar-link">
+<a href="my-projects.html" class="sidebar-link business-only">
     <i class="fa-solid fa-folder-open"></i>
     <span>My Projects</span>
 </a>
 
+<a href="applications.html" class="sidebar-link professional-only">
+    <i class="fa-solid fa-file-lines"></i>
+    <span>My Applications</span>
+</a>
 
             
 <a href="messages.html" class="sidebar-link">
@@ -239,7 +243,8 @@
                         <p>Your latest project activity.</p>
                     </div>
 
-                    <a href="my-projects.html" class="view-all">View All</a>
+                    <a href="my-projects.html" class="view-all business-only">View All</a>
+                    <a href="applications.html" class="view-all professional-only">View All</a>
 
                 </div>
 
@@ -401,6 +406,7 @@
 
 
     <script src="js/dashboard.js"></script>
+    <script src="js/role-access.js"></script>
 
 </body>
 </html>
