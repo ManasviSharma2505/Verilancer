@@ -764,8 +764,7 @@ app.get("/api/projects/:projectId/applications", (req, res) => {
             u.name AS professionalName,
             u.email AS professionalEmail,
             pp.skills,
-            pp.bio,
-            pp.location
+            pp.bio
         FROM project_applications pa
         JOIN projects p
             ON p.id = pa.project_id
