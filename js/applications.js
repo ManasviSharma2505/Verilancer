@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <p class="application-business">Posted by ${escapeHtml(application.businessName || "Business")}</p>
                     <div class="application-meta">
                         <span>Project budget<strong>${money(application.budget)}</strong></span>
+                        <span>Your bid<strong>${money(application.bidAmount)}</strong></span>
                         <span>Deadline<strong>${escapeHtml(date(application.deadline))}</strong></span>
                         <span>Applied on<strong>${escapeHtml(date(application.appliedAt))}</strong></span>
                         <span>Project status<strong>${escapeHtml(application.projectStatus || "Unknown")}</strong></span>
