@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings | Verilancer</title>
+<link rel="icon" href="images/verilancer-logo-transparent.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+<aside class="sidebar">
+ <div class="sidebar-logo"><a href="index.html"><img src="images/verilancer-logo-transparent.png" alt="Verilancer Logo"></a></div>
+ <nav class="sidebar-nav">
+  <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-grid-2"></i><span>Dashboard</span></a>
+  <a href="projects.html" class="sidebar-link professional-only"><i class="fa-solid fa-magnifying-glass"></i><span>Find Projects</span></a>
+  <a href="my-projects.html" class="sidebar-link business-only"><i class="fa-solid fa-folder-open"></i><span>My Projects</span></a>
+  <a href="applications.html" class="sidebar-link professional-only"><i class="fa-solid fa-file-lines"></i><span>My Applications</span></a>
+  <a href="messages.html" class="sidebar-link"><i class="fa-regular fa-message"></i><span>Messages</span></a>
+  <a href="profile.html" class="sidebar-link"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+  <a href="#" class="sidebar-link" id="paymentsLink"><i class="fa-solid fa-wallet"></i><span>Payments</span></a>
+  <a href="settings.html" class="sidebar-link active"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+ </nav>
+ <div class="sidebar-bottom">
+  <a href="index.html" class="sidebar-link"><i class="fa-solid fa-house"></i><span>Back to Website</span></a>
+  <a href="#" class="sidebar-link logout-link" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
+ </div>
+</aside>
+<main class="dashboard-main settings-main">
+ <header class="dashboard-header">
+  <div class="mobile-menu"><button id="mobileMenuBtn" type="button" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button></div>
+  <div class="header-title"><h1>Settings</h1><p>Manage your account and preferences.</p></div>
+  <div class="header-actions"><div class="profile-mini"><div class="profile-avatar" id="profileAvatar">U</div><div class="profile-info"><strong id="headerUserName">User</strong><span id="headerUserRole">Professional</span></div></div></div>
+ </header>
+ <section class="settings-intro"><span>YOUR ACCOUNT</span><h2>Account settings</h2><p>Keep your account details and preferences up to date.</p></section>
+ <section class="settings-card">
+  <div class="settings-card-heading"><div class="settings-icon"><i class="fa-regular fa-user"></i></div><div><h3>Personal details</h3><p>Update the name associated with your Verilancer account.</p></div></div>
+  <form id="accountForm">
+   <div class="settings-fields">
+    <label>Full name<input id="accountName" name="name" type="text" maxlength="100" required></label>
+    <label>Email address<input id="accountEmail" type="email" readonly><small>Your email address cannot be changed here.</small></label>
+    <label>Account type<input id="accountRole" type="text" readonly></label>
+   </div>
+   <p class="settings-message" id="accountMessage" role="status"></p>
+   <button class="settings-save" id="saveAccount" type="submit">Save changes</button>
+  </form>
+ </section>
+ <section class="settings-card">
+  <div class="settings-card-heading"><div class="settings-icon"><i class="fa-regular fa-bell"></i></div><div><h3>Notification preferences</h3><p>Choose which updates you want to receive in this browser.</p></div></div>
+  <div class="settings-preference"><div><strong>Project and proposal updates</strong><p>Updates when applications or proposals change.</p></div><label class="switch"><input type="checkbox" id="projectNotifications"><span></span></label></div>
+  <div class="settings-preference"><div><strong>Messages</strong><p>Notifications about new messages.</p></div><label class="switch"><input type="checkbox" id="messageNotifications"><span></span></label></div>
+  <p class="settings-message" id="preferencesMessage" role="status"></p>
+ </section>
+ <section class="settings-card security-card">
+  <div class="settings-card-heading"><div class="settings-icon"><i class="fa-solid fa-shield-halved"></i></div><div><h3>Security</h3><p>Keep access to your account under your control.</p></div></div>
+  <div class="security-note"><i class="fa-solid fa-circle-info"></i><span>Password changes are not available yet. Your current password remains unchanged.</span></div>
+  <button class="settings-logout" id="securityLogout" type="button">Log out of Verilancer</button>
+ </section>
+ <footer class="dashboard-footer"><p>© 2026 Verilancer. Where talent meets opportunities.</p></footer>
+</main>
+<script src="js/settings.js"></script>
+<script src="js/role-access.js"></script>
+</body>
+</html>
