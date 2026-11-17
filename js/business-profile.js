@@ -4,15 +4,6 @@ const loggedIn = localStorage.getItem("verilancerLoggedIn") === "true";
 if (!user?.id || !loggedIn) location.href = "login.html";
 const $ = id => document.getElementById(id);
 const fields = {name:$("businessName"),industry:$("businessIndustry"),about:$("businessAbout"),website:$("businessWebsite"),phone:$("businessPhone")};
-function preview(){
- $("businessDisplayName").textContent = fields.name.value.trim() || "Your Business";
- $("businessDisplayIndustry").textContent = fields.industry.value.trim() || "Add your industry";
- $("previewName").textContent = fields.name.value.trim() || "Your business name";
- $("previewIndustry").textContent = fields.industry.value.trim() || "Industry not added.";
- $("previewAbout").textContent = fields.about.value.trim() || "Add an introduction about your business.";
- $("previewWebsite").textContent = fields.website.value.trim() || "No links added.";
-}
-Object.values(fields).forEach(el=>el.addEventListener("input",preview));
 async function loadBusiness(){
  try{
   const response=await fetch(API_BASE+"/profile/"+user.id);
@@ -24,7 +15,6 @@ async function loadBusiness(){
   fields.about.value=data.bio||"";
   fields.website.value=data.portfolio||"";
   fields.phone.value=data.phone||"";
-  preview();
  }catch(error){$("businessStatus").textContent=error.message;$("businessStatus").style.color="#c0392b";}
 }
 $("businessForm").addEventListener("submit",async event=>{
