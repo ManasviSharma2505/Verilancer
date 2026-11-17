@@ -335,5 +335,9 @@ socket.on("newMessage", async (message) => {
         }
     });
 
-    loadConversations();
+    const requestedApplicationId = Number(
+        new URLSearchParams(window.location.search).get("applicationId")
+    ) || null;
+
+    loadConversations(requestedApplicationId);
 });
