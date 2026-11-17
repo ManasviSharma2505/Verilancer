@@ -107,7 +107,16 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </span>
                             </div>
 
-                            ${application.status === "pending" ? `
+                            ${application.status === "accepted" ? `
+                                <div class="proposal-actions">
+                                    <a class="my-project-button message-professional-btn"
+                                       href="messages.html?applicationId=${Number(application.applicationId)}">
+                                        Message Professional
+                                    </a>
+                                </div>
+                            ` : ""}
+
+${application.status === "pending" ? `
                                 <div class="proposal-actions">
                                     <button
                                         type="button"
