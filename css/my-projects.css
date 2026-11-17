@@ -40,12 +40,16 @@
     border-bottom: 1px solid var(--mp-border);
 }
 
-.my-projects-brand {
-    color: var(--mp-green-dark);
-    font-family: 'Manrope', sans-serif;
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: -1.1px;
+.my-projects-brand{
+    display:inline-flex;
+    align-items:center;
+}
+
+.my-projects-brand img{
+    display:block;
+    width:66px;
+    height:66px;
+    object-fit:contain;
 }
 
 .my-projects-nav {
