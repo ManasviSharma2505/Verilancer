@@ -122,14 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     )}
                                 </p>
 
-                                <p>
-                                    <strong>Location:</strong>
-                                    ${escapeHtml(
-                                        application.location || "Not provided"
-                                    )}
-                                </p>
-
-                                <p>
+<p>
                                     <strong>About:</strong>
                                     ${escapeHtml(
                                         application.bio || "Not provided"
