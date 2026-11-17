@@ -70,18 +70,22 @@ db.query(`
         project_updates TINYINT(1) NOT NULL DEFAULT 1,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
-`, err => { if (err) console.error("Notification preferences table:", err.message); });
-
-db.query("SHOW COLUMNS FROM notification_preferences LIKE 'message_updates'", (columnError, columns) => {
-    if (columnError) {
-        console.error("Check message notification preference column:", columnError.message);
+`, err => {
+    if (err) {
+        console.error("Notification preferences table:", err.message);
         return;
     }
-    if (!columns.length) {
-        db.query("ALTER TABLE notification_preferences ADD COLUMN message_updates TINYINT(1) NOT NULL DEFAULT 1", alterError => {
-            if (alterError) console.error("Add message notification preference column:", alterError.message);
-        });
-    }
+    db.query("SHOW COLUMNS FROM notification_preferences LIKE 'message_updates'", (columnError, columns) => {
+        if (columnError) {
+            console.error("Check message notification preference column:", columnError.message);
+            return;
+        }
+        if (!columns.length) {
+            db.query("ALTER TABLE notification_preferences ADD COLUMN message_updates TINYINT(1) NOT NULL DEFAULT 1", alterError => {
+                if (alterError) console.error("Add message notification preference column:", alterError.message);
+            });
+        }
+    });
 });
 
 db.query(`
