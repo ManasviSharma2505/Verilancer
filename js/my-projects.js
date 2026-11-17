@@ -107,6 +107,25 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </span>
                             </div>
 
+                            ${application.status === "pending" ? `
+                                <div class="proposal-actions">
+                                    <button
+                                        type="button"
+                                        class="my-project-button accept-proposal-btn"
+                                        data-application-id="${Number(application.applicationId)}"
+                                        data-project-id="${Number(projectId)}">
+                                        Accept Bid
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="my-project-button reject-proposal-btn"
+                                        data-application-id="${Number(application.applicationId)}"
+                                        data-project-id="${Number(projectId)}">
+                                        Reject Bid
+                                    </button>
+                                </div>
+                            ` : ""}
+
                             <div class="proposal-bid">
                                 <span>Professional's bid</span>
                                 <strong>${formatMoney(
@@ -314,6 +333,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (panel) {
                 await loadProposals(projectId, panel);
+            }
+            return;
+        }
+
+        const decisionButton = event.target.closest(
+            ".accept-proposal-btn, .reject-proposal-btn"
+        );
+
+        if (decisionButton) {
+            const applicationId = Number(decisionButton.dataset.applicationId);
+            const projectId = Number(decisionButton.dataset.projectId);
+            const status = decisionButton.classList.contains("accept-proposal-btn")
+                ? "accepted"
+                : "rejected";
+            const actionLabel = status === "accepted" ? "accept" : "reject";
+
+            if (!confirm(`Are you sure you want to ${actionLabel} this bid?`)) {
+                return;
+            }
+
+            decisionButton.disabled = true;
+            message.textContent = "";
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/applications/${encodeURIComponent(applicationId)}/status`,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            businessId: user.id,
+                            status
+                        })
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || `Could not ${actionLabel} bid.`);
+                }
+
+                message.textContent = result.message;
+                const panel = document.getElementById(`proposals-${projectId}`);
+                if (panel) await loadProposals(projectId, panel);
+            } catch (error) {
+                message.textContent = error.message;
+                decisionButton.disabled = false;
             }
             return;
         }
