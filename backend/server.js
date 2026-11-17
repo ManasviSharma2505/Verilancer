@@ -1,12 +1,59 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const db = require("./db");
 const bcrypt = require("bcrypt");
 
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
 app.use(cors());
 const PORT = 5001;
+
+
+io.on("connection", (socket) => {
+    console.log("Socket connected:", socket.id);
+
+    socket.on("joinConversation", ({ applicationId, userId }) => {
+        const appId = Number(applicationId);
+        const uid = Number(userId);
+
+        if (
+            !Number.isInteger(appId) || appId <= 0 ||
+            !Number.isInteger(uid) || uid <= 0
+        ) {
+            return;
+        }
+
+        const sql = `
+            SELECT a.id
+            FROM project_applications a
+            JOIN projects p ON p.id = a.project_id
+            WHERE a.id = ?
+              AND (a.professional_id = ? OR p.business_id = ?)
+        `;
+
+        db.query(sql, [appId, uid, uid], (err, rows) => {
+            if (!err && rows.length > 0) {
+                socket.join(`application_${appId}`);
+            }
+        });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Socket disconnected:", socket.id);
+    });
+});
+
 
 app.use((req, res, next) => {
     console.log("REQUEST RECEIVED:", req.method, req.url);
@@ -1053,10 +1100,42 @@ app.post("/api/messages/:applicationId", (req, res) => {
                         });
                     }
 
-                    return res.status(201).json({
-                        message: "Message sent successfully.",
-                        id: result.insertId
-                    });
+                    db.query(
+    `SELECT
+        m.id,
+        m.application_id AS applicationId,
+        m.sender_id AS senderId,
+        m.message,
+        m.created_at AS createdAt,
+        u.name AS senderName
+     FROM project_messages m
+     JOIN users u ON u.id = m.sender_id
+     WHERE m.id = ?`,
+    [result.insertId],
+    (fetchErr, savedMessages) => {
+        if (fetchErr || !savedMessages.length) {
+            console.error("Fetch saved message error:", fetchErr);
+
+            return res.status(201).json({
+                message: "Message sent successfully.",
+                id: result.insertId
+            });
+        }
+
+        const savedMessage = savedMessages[0];
+
+        io.to(`application_${applicationId}`).emit(
+            "newMessage",
+            savedMessage
+        );
+
+        return res.status(201).json({
+            message: "Message sent successfully.",
+            id: result.insertId,
+            savedMessage
+        });
+    }
+);
                 }
             );
         }
@@ -1064,6 +1143,6 @@ app.post("/api/messages/:applicationId", (req, res) => {
 });
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

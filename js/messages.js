@@ -28,8 +28,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedback = $("messageFeedback");
 
     let conversations = [];
-    let selectedApplicationId = null;
-    let loadingMessages = false;
+let selectedApplicationId = null;
+let loadingMessages = false;
+
+const socket = io("http://localhost:5001");
+
+socket.on("connect", () => {
+    console.log("Verilancer realtime connected:", socket.id);
+
+    if (selectedApplicationId) {
+        socket.emit("joinConversation", {
+            applicationId: selectedApplicationId,
+            userId: user.id
+        });
+    }
+});
+
+socket.on("newMessage", async (message) => {
+    if (
+        Number(message.applicationId) === Number(selectedApplicationId) &&
+        Number(message.senderId) !== Number(user.id)
+    ) {
+        await loadMessages(selectedApplicationId);
+    }
+
+    await loadConversations(selectedApplicationId);
+});
 
     $("messagesUserName").textContent = user.name || "User";
     $("messagesUserRole").textContent = isBusiness ? "Business" : "Professional";
@@ -168,6 +192,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!conversation) return;
 
         selectedApplicationId = applicationId;
+        socket.emit("joinConversation", {
+    applicationId: applicationId,
+    userId: user.id
+});
         renderConversations();
 
         chatEmpty.hidden = true;
