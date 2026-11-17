@@ -193,6 +193,24 @@ app.get("/api/test", (req, res) => {
 
 
 
+// Update only the account display name without overwriting profile details.
+app.patch("/api/account/:userId/name", (req, res) => {
+    const userId = Number(req.params.userId);
+    const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
+    if (!Number.isInteger(userId) || userId <= 0 || !name || name.length > 100) {
+        return res.status(400).json({ message: "A valid user ID and name (1–100 characters) are required." });
+    }
+    db.query("UPDATE users SET name = ? WHERE id = ?", [name, userId], (err, result) => {
+        if (err) {
+            console.error("Account name update error:", err);
+            return res.status(500).json({ message: "Unable to update account name." });
+        }
+        if (!result.affectedRows) return res.status(404).json({ message: "Account not found." });
+        return res.json({ message: "Account name updated successfully.", name });
+    });
+});
+
+
 app.get("/api/profile/:userId", (req, res) => {
     const userId = Number(req.params.userId);
 
