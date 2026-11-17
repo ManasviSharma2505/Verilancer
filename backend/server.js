@@ -63,6 +63,111 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// Notification storage and preference tables are created automatically.
+db.query(`
+    CREATE TABLE IF NOT EXISTS notification_preferences (
+        user_id INT PRIMARY KEY,
+        project_updates TINYINT(1) NOT NULL DEFAULT 1,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+`, err => { if (err) console.error("Notification preferences table:", err.message); });
+
+db.query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        type VARCHAR(40) NOT NULL,
+        title VARCHAR(180) NOT NULL,
+        message VARCHAR(500) NOT NULL,
+        related_application_id INT NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_notifications_user_created (user_id, created_at),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+`, err => { if (err) console.error("Notifications table:", err.message); });
+
+function createProjectNotification(userId, type, title, message, applicationId) {
+    db.query(
+        "SELECT project_updates FROM notification_preferences WHERE user_id = ?",
+        [userId],
+        (preferenceError, rows) => {
+            if (preferenceError) {
+                console.error("Notification preference lookup:", preferenceError.message);
+                return;
+            }
+            if (rows.length && Number(rows[0].project_updates) === 0) return;
+            db.query(
+                `INSERT INTO notifications
+                    (user_id, type, title, message, related_application_id)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [userId, type, title, message, applicationId || null],
+                insertError => {
+                    if (insertError) console.error("Create notification:", insertError.message);
+                }
+            );
+        }
+    );
+}
+
+
+
+
+// Persist project/proposal notification preference for this account.
+app.put("/api/notification-preferences/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+    const enabled = req.body.projectUpdates;
+    if (!Number.isInteger(userId) || userId <= 0 || typeof enabled !== "boolean") {
+        return res.status(400).json({ message: "A valid user ID and boolean preference are required." });
+    }
+    db.query(
+        `INSERT INTO notification_preferences (user_id, project_updates)
+         VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE project_updates = VALUES(project_updates)`,
+        [userId, enabled ? 1 : 0],
+        err => {
+            if (err) {
+                console.error("Save notification preference:", err);
+                return res.status(500).json({ message: "Unable to save notification preference." });
+            }
+            return res.json({ message: "Notification preference saved.", projectUpdates: enabled });
+        }
+    );
+});
+
+// Get recent project/proposal notifications.
+app.get("/api/notifications/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({ message: "A valid user ID is required." });
+    }
+    db.query(
+        "SELECT id, type, title, message, related_application_id AS applicationId, is_read AS isRead, created_at AS createdAt FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50",
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error("Load notifications:", err);
+                return res.status(500).json({ message: "Unable to load notifications." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
+// Mark one notification as read, only for its owner.
+app.patch("/api/notifications/:notificationId/read", (req, res) => {
+    const notificationId = Number(req.params.notificationId);
+    const userId = Number(req.body.userId);
+    if (!Number.isInteger(notificationId) || notificationId <= 0 || !Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({ message: "Valid notification and user IDs are required." });
+    }
+    db.query("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?", [notificationId, userId], (err, result) => {
+        if (err) return res.status(500).json({ message: "Unable to update notification." });
+        if (!result.affectedRows) return res.status(404).json({ message: "Notification not found." });
+        return res.json({ message: "Notification marked as read." });
+    });
+});
+
 app.get("/", (req, res) => {
     res.send("Verilancer backend is running!");
 });
@@ -681,10 +786,25 @@ db.query(
             });
         }
 
-        return res.status(201).json({
-            message: "Your bid and proposal have been submitted successfully!",
-            applicationId: result.insertId
-        });
+        db.query(
+            "SELECT business_id, title FROM projects WHERE id = ?",
+            [projectId],
+            (projectLookupError, projectRows) => {
+                if (!projectLookupError && projectRows.length) {
+                    createProjectNotification(
+                        projectRows[0].business_id,
+                        "proposal_received",
+                        "New proposal received",
+                        `A professional submitted a proposal for "${projectRows[0].title}".`,
+                        result.insertId
+                    );
+                }
+                return res.status(201).json({
+                    message: "Your bid and proposal have been submitted successfully!",
+                    applicationId: result.insertId
+                });
+            }
+        );
     }
 );
                 }
@@ -854,9 +974,26 @@ app.patch("/api/applications/:applicationId/status", (req, res) => {
                 });
             }
 
-            return res.json({
-                message: `Application ${status} successfully.`
-            });
+            db.query(
+                `SELECT a.professional_id, p.title
+                 FROM project_applications a
+                 JOIN projects p ON p.id = a.project_id
+                 WHERE a.id = ?`,
+                [applicationId],
+                (lookupError, rows) => {
+                    if (!lookupError && rows.length) {
+                        const accepted = status === "accepted";
+                        createProjectNotification(
+                            rows[0].professional_id,
+                            accepted ? "proposal_accepted" : "proposal_rejected",
+                            accepted ? "Your proposal was accepted" : "Your proposal was not selected",
+                            `The business has ${accepted ? "accepted" : "rejected"} your proposal for "${rows[0].title}".`,
+                            applicationId
+                        );
+                    }
+                    return res.json({ message: `Application ${status} successfully.` });
+                }
+            );
         }
     );
 });
