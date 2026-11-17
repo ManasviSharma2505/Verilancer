@@ -552,6 +552,8 @@ body{
 
     flex:1;
 
+    position:relative;
+
     display:flex;
 
     justify-content:center;
@@ -559,6 +561,30 @@ body{
     align-items:center;
 
     min-height:500px;
+
+    overflow:hidden;
+}
+
+/* Original Verilancer mark as a subtle hero watermark */
+.hero-image::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background-image:url("../images/verilancer-logo-transparent.png");
+
+    background-repeat:no-repeat;
+
+    background-size:200% auto;
+
+    background-position:center 30%;
+
+    opacity:.14;
+
+    pointer-events:none;
 }
 
 .quote-line{
