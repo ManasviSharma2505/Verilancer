@@ -39,6 +39,7 @@ io.on("connection", (socket) => {
             FROM project_applications a
             JOIN projects p ON p.id = a.project_id
             WHERE a.id = ?
+              AND a.status = 'accepted'
               AND (a.professional_id = ? OR p.business_id = ?)
         `;
 
@@ -921,8 +922,9 @@ app.get("/api/messages/conversations/:userId", (req, res) => {
                 ORDER BY m.created_at DESC, m.id DESC
                 LIMIT 1
             )
-        WHERE a.professional_id = ?
-           OR p.business_id = ?
+        WHERE a.status = 'accepted'
+          AND (a.professional_id = ?
+           OR p.business_id = ?)
         ORDER BY COALESCE(latest.created_at, a.created_at) DESC
     `;
 
@@ -1001,6 +1003,7 @@ app.get("/api/messages/:applicationId", (req, res) => {
               FROM project_applications a
               JOIN projects p ON p.id = a.project_id
               WHERE a.id = m.application_id
+                AND a.status = 'accepted'
                 AND (a.professional_id = ? OR p.business_id = ?)
           )
         ORDER BY m.created_at ASC, m.id ASC
@@ -1012,6 +1015,7 @@ app.get("/api/messages/:applicationId", (req, res) => {
          FROM project_applications a
          JOIN projects p ON p.id = a.project_id
          WHERE a.id = ?
+           AND a.status = 'accepted'
            AND (a.professional_id = ? OR p.business_id = ?)`,
         [applicationId, userId, userId],
         (checkErr, access) => {
@@ -1066,6 +1070,7 @@ app.post("/api/messages/:applicationId", (req, res) => {
         FROM project_applications a
         JOIN projects p ON p.id = a.project_id
         WHERE a.id = ?
+          AND a.status = 'accepted'
           AND (a.professional_id = ? OR p.business_id = ?)
     `;
 
