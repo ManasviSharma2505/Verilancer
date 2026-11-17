@@ -38,13 +38,16 @@ a {
 }
 
 .brand {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.7px;
+    display:inline-flex;
+    align-items:center;
+    flex:0 0 auto;
 }
 
-.brand span {
-    color: var(--green);
+.brand img{
+    display:block;
+    width:66px;
+    height:66px;
+    object-fit:contain;
 }
 
 .market-header nav {
