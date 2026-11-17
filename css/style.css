@@ -572,19 +572,19 @@ body{
 
     position:absolute;
 
-    inset:0;
+    inset:-30px;
 
     background-image:url("../images/verilancer-logo-transparent.png");
 
     background-repeat:no-repeat;
 
-    background-size:200% auto;
+    background-size:175% auto;
 
     background-position:center 30%;
 
     opacity:.14;
 
-    transform:rotate(-8deg) scale(1.08);
+    transform:rotate(-8deg);
 
     pointer-events:none;
 }
