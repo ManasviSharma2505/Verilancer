@@ -71,6 +71,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <h3>Your proposal</h3>
                         <p>${escapeHtml(application.proposal)}</p>
                     </div>
+                    ${status === "accepted" ? `
+                        <a class="application-message-link" href="messages.html?applicationId=${Number(application.applicationId)}">
+                            Message Business
+                        </a>
+                    ` : ""}
                 </article>`;
         }).join("");
     } catch (error) {
