@@ -54,13 +54,31 @@ document.addEventListener("DOMContentLoaded", async () => {
  try { preferences = {...preferences,...JSON.parse(localStorage.getItem(preferencesKey) || "{}")}; } catch {}
  get("projectNotifications").checked = preferences.projects;
  get("messageNotifications").checked = preferences.messages;
- const savePreferences = () => {
+ const savePreferences = async () => {
   preferences = {projects:get("projectNotifications").checked,messages:get("messageNotifications").checked};
   localStorage.setItem(preferencesKey, JSON.stringify(preferences));
   const status = get("preferencesMessage");
-  status.textContent = "Preferences saved in this browser.";
-  status.style.color = "#16803c";
+  status.textContent = "Saving preferences...";
+  status.style.color = "#667085";
+  try {
+   const response = await fetch(`${API_BASE}/notification-preferences/${encodeURIComponent(user.id)}`, {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({projectUpdates: preferences.projects})
+   });
+   const data = await response.json();
+   if (!response.ok) throw new Error(data.message || "Unable to sync notification preference.");
+   status.textContent = preferences.projects
+    ? "Project and proposal notifications are turned on."
+    : "Project and proposal notifications are turned off.";
+   status.style.color = "#16803c";
+  } catch (error) {
+   status.textContent = "Saved on this device, but server sync failed: " + error.message;
+   status.style.color = "#c0392b";
+  }
  };
+ // Sync the saved browser preference so the backend respects it for future events.
+ savePreferences();
  get("projectNotifications").addEventListener("change", savePreferences);
  get("messageNotifications").addEventListener("change", savePreferences);
  const logout = () => {
