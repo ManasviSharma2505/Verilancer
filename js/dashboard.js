@@ -401,12 +401,97 @@ const projects = await response.json();
         });
     }
 
-    // 11. Notification placeholder
-    const notificationBtn = document.querySelector(".notification-btn");
+    // 11. Load and display real project/proposal notifications.
+    const notificationBtn = get("notificationBtn");
+    const notificationPanel = get("notificationPanel");
+    const notificationList = get("notificationList");
+    const notificationCount = get("notificationCount");
+    const closeNotifications = get("closeNotifications");
+    let notificationItems = [];
 
-    if (notificationBtn) {
-        notificationBtn.addEventListener("click", function () {
-            showComingSoon("Notifications");
+    function renderNotifications() {
+        if (!notificationList) return;
+        const unreadCount = notificationItems.filter(item => !Number(item.isRead)).length;
+        if (notificationCount) {
+            notificationCount.hidden = unreadCount === 0;
+            notificationCount.textContent = unreadCount > 9 ? "9+" : String(unreadCount);
+        }
+        if (!notificationItems.length) {
+            notificationList.innerHTML = '<div class="notification-empty"><i class="fa-regular fa-bell-slash"></i><strong>You’re all caught up</strong><span>New project and proposal updates will appear here.</span></div>';
+            return;
+        }
+        notificationList.innerHTML = notificationItems.map(item => {
+            const safeTitle = escapeDashboardHtml(item.title);
+            const safeMessage = escapeDashboardHtml(item.message);
+            const date = item.createdAt ? new Date(item.createdAt).toLocaleString([], {dateStyle:"medium",timeStyle:"short"}) : "";
+            return `<button type="button" class="notification-item ${Number(item.isRead) ? "" : "unread"}" data-notification-id="${Number(item.id)}" data-application-id="${Number(item.applicationId) || ""}" data-notification-type="${escapeDashboardHtml(item.type)}">
+                <span class="notification-item-icon"><i class="fa-regular fa-bell"></i></span>
+                <span class="notification-item-content"><strong>${safeTitle}</strong><span>${safeMessage}</span><small>${escapeDashboardHtml(date)}</small></span>
+                ${Number(item.isRead) ? "" : '<span class="notification-unread-dot"></span>'}
+            </button>`;
+        }).join("");
+    }
+
+    async function loadNotifications() {
+        if (!notificationList) return;
+        try {
+            const response = await fetch(`${API_BASE}/notifications/${encodeURIComponent(user.id)}`);
+            const data = await response.json();
+            if (!response.ok || !Array.isArray(data)) throw new Error(data.message || "Unable to load notifications.");
+            notificationItems = data;
+            renderNotifications();
+        } catch (error) {
+            console.error("Notifications error:", error);
+            notificationList.innerHTML = '<p class="notification-empty">Notifications could not be loaded. Please refresh the page.</p>';
+        }
+    }
+
+    async function openNotification(item) {
+        if (!Number(item.isRead)) {
+            try {
+                const response = await fetch(`${API_BASE}/notifications/${encodeURIComponent(item.id)}/read`, {
+                    method: "PATCH", headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({userId: user.id})
+                });
+                if (!response.ok) throw new Error("Unable to mark notification as read.");
+                item.isRead = 1;
+                renderNotifications();
+            } catch (error) { console.error(error); }
+        }
+        const applicationId = Number(item.applicationId);
+        if (item.type === "proposal_received") {
+            window.location.href = "my-projects.html";
+        } else if (item.type === "proposal_accepted" && applicationId) {
+            window.location.href = `messages.html?applicationId=${applicationId}`;
+        } else if (applicationId) {
+            window.location.href = "applications.html";
+        }
+    }
+
+    if (notificationBtn && notificationPanel) {
+        notificationBtn.addEventListener("click", () => {
+            const isOpen = !notificationPanel.hidden;
+            notificationPanel.hidden = isOpen;
+            notificationBtn.setAttribute("aria-expanded", String(!isOpen));
+            if (!isOpen) loadNotifications();
         });
+        closeNotifications?.addEventListener("click", () => {
+            notificationPanel.hidden = true;
+            notificationBtn.setAttribute("aria-expanded", "false");
+        });
+        notificationList?.addEventListener("click", event => {
+            const itemElement = event.target.closest("[data-notification-id]");
+            if (!itemElement) return;
+            const item = notificationItems.find(entry => Number(entry.id) === Number(itemElement.dataset.notificationId));
+            if (item) openNotification(item);
+        });
+        document.addEventListener("click", event => {
+            if (!event.target.closest(".notification-wrapper")) {
+                notificationPanel.hidden = true;
+                notificationBtn.setAttribute("aria-expanded", "false");
+            }
+        });
+        loadNotifications();
+        window.setInterval(loadNotifications, 30000);
     }
 });
