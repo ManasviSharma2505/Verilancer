@@ -857,8 +857,7 @@ app.get("/api/professional-profiles/:userId", (req, res) => {
             u.id,
             u.name,
             pp.skills,
-            pp.bio,
-            pp.location
+            pp.bio
         FROM users u
         LEFT JOIN professional_profiles pp
             ON pp.user_id = u.id
