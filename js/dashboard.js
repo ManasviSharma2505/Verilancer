@@ -417,7 +417,7 @@ const projects = await response.json();
             notificationCount.textContent = unreadCount > 9 ? "9+" : String(unreadCount);
         }
         if (!notificationItems.length) {
-            notificationList.innerHTML = '<div class="notification-empty"><i class="fa-regular fa-bell-slash"></i><strong>You’re all caught up</strong><span>New project and proposal updates will appear here.</span></div>';
+            notificationList.innerHTML = '<div class="notification-empty"><i class="fa-regular fa-bell-slash"></i><strong>You’re all caught up</strong><span>New project, proposal and message updates will appear here.</span></div>';
             return;
         }
         notificationList.innerHTML = notificationItems.map(item => {
@@ -461,7 +461,7 @@ const projects = await response.json();
         const applicationId = Number(item.applicationId);
         if (item.type === "proposal_received") {
             window.location.href = "my-projects.html";
-        } else if (item.type === "proposal_accepted" && applicationId) {
+        } else if ((item.type === "proposal_accepted" || item.type === "message_received") && applicationId) {
             window.location.href = `messages.html?applicationId=${applicationId}`;
         } else if (applicationId) {
             window.location.href = "applications.html";
