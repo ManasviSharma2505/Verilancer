@@ -64,13 +64,14 @@ document.addEventListener("DOMContentLoaded", async () => {
    const response = await fetch(`${API_BASE}/notification-preferences/${encodeURIComponent(user.id)}`, {
     method: "PUT",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({projectUpdates: preferences.projects})
+    body: JSON.stringify({
+     projectUpdates: preferences.projects,
+     messageUpdates: preferences.messages
+    })
    });
    const data = await response.json();
    if (!response.ok) throw new Error(data.message || "Unable to sync notification preference.");
-   status.textContent = preferences.projects
-    ? "Project and proposal notifications are turned on."
-    : "Project and proposal notifications are turned off.";
+   status.textContent = "Notification preferences saved.";
    status.style.color = "#16803c";
   } catch (error) {
    status.textContent = "Saved on this device, but server sync failed: " + error.message;
