@@ -42,3 +42,19 @@
 .applications-empty p { color: var(--mp-muted); font-size: 14px; }
 .applications-empty a { display: inline-flex; margin-top: 15px; padding: 12px 18px; color: #fff; background: var(--mp-green); border-radius: 9px; font-size: 13px; font-weight: 700; text-decoration: none; }
 @media (max-width: 760px) { #myApplicationsList { grid-template-columns: 1fr; } .application-card { padding: 22px; } }
+
+.application-message-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+    padding: 11px 18px;
+    color: #fff;
+    background: #1F5FBF;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .2s ease;
+}
+.application-message-link:hover { background: #174b99; }
