@@ -15,4 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".business-only").forEach(function (element) {
         element.style.display = isBusiness ? "" : "none";
     });
+
+    document.querySelectorAll(".professional-only").forEach(function (element) {
+        element.style.display = user && !isBusiness ? "" : "none";
+    });
 });
