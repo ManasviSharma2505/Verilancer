@@ -46,12 +46,16 @@
 }
 
 .browse-brand {
-    color: var(--browse-green-dark) !important;
-    font-family: 'Manrope', sans-serif;
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: -1.1px;
-    white-space: nowrap;
+    display:inline-flex;
+    align-items:center;
+    flex:0 0 auto;
+}
+
+.browse-brand img{
+    display:block;
+    width:66px;
+    height:66px;
+    object-fit:contain;
 }
 
 .browse-brand span,
