@@ -22,6 +22,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+    // Keep the shared dashboard shell functional on this page.
+    const displayName = user.name || "User";
+    const headerName = document.getElementById("headerUserName");
+    const avatar = document.getElementById("profileAvatar");
+    if (headerName) headerName.textContent = displayName;
+    if (avatar) avatar.textContent = displayName.trim().charAt(0).toUpperCase() || "U";
+
+    const sidebar = document.querySelector(".sidebar");
+    const menuButton = document.getElementById("mobileMenuBtn");
+    if (menuButton && sidebar) {
+        menuButton.addEventListener("click", () => {
+            const open = sidebar.classList.toggle("mobile-open");
+            menuButton.setAttribute("aria-expanded", String(open));
+        });
+    }
+
+    document.querySelectorAll("[data-coming-soon]").forEach(link => {
+        link.addEventListener("click", event => {
+            event.preventDefault();
+            alert(link.dataset.comingSoon + " is coming soon to Verilancer.");
+        });
+    });
+
+    const logoutButton = document.querySelector("[data-dashboard-logout]");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", event => {
+            event.preventDefault();
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.removeItem("verilancerLoggedIn");
+                localStorage.removeItem("verilancerUser");
+                window.location.href = "index.html";
+            }
+        });
+    }
+
     const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     })[char]);
