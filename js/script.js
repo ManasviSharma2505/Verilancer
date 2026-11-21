@@ -16,31 +16,18 @@ window.addEventListener("scroll", () => {
 
 });
 // ===========================
-// FAQ Accordion
+// FAQ Accordion - allow multiple answers to stay open
 // ===========================
 
 const faqItems = document.querySelectorAll(".faq-item");
 
 faqItems.forEach(item => {
-
     const question = item.querySelector(".faq-question");
 
+    if (!question) return;
+
     question.addEventListener("click", () => {
-
-        // Close all other FAQs
-        faqItems.forEach(other => {
-
-            if(other !== item){
-
-                other.classList.remove("active");
-
-            }
-
-        });
-
-        // Toggle current FAQ
-        item.classList.toggle("active");
-
+        const isOpen = item.classList.toggle("active");
+        question.setAttribute("aria-expanded", String(isOpen));
     });
-
 });
