@@ -26,6 +26,7 @@
         <button class="admin-nav-link" data-section="users"><i class="fa-solid fa-users"></i> Users</button>
         <button class="admin-nav-link" data-section="projects"><i class="fa-solid fa-folder-open"></i> Projects</button>
         <button class="admin-nav-link" data-section="proposals"><i class="fa-solid fa-file-lines"></i> Proposals</button>
+        <button class="admin-nav-link" data-section="conversations"><i class="fa-solid fa-comments"></i> Conversations</button>
     </nav>
     <div class="admin-sidebar-bottom">
         <div class="admin-sidebar-bottom-label">QUICK LINKS</div>
@@ -67,6 +68,27 @@
     <section class="admin-section" id="section-proposals">
         <div class="admin-section-heading"><div><h2>Proposals</h2><p>Professional applications and their current status.</p></div><input class="admin-search" id="proposalsSearch" type="search" placeholder="Search project, person or status…"></div>
         <div class="admin-table-wrap"><table><thead><tr><th>Project</th><th>Professional</th><th>Business</th><th>Bid amount</th><th>Status</th><th>ID</th></tr></thead><tbody id="proposalsTable"><tr><td colspan="6" class="admin-table-empty">Loading proposals…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="admin-section" id="section-conversations">
+        <div class="admin-section-heading">
+            <div><h2>Conversations</h2><p>Read-only access to project message history for platform support and safety.</p></div>
+            <input class="admin-search" id="conversationsSearch" type="search" placeholder="Search project, user or email…">
+        </div>
+        <div class="admin-conversation-layout">
+            <div class="admin-conversation-list-wrap">
+                <div class="admin-panel-heading"><strong>Message threads</strong><span id="conversationCount">Loading…</span></div>
+                <div id="conversationsList" class="admin-conversation-list"><div class="admin-table-empty">Loading conversations…</div></div>
+            </div>
+            <div class="admin-conversation-detail" id="conversationDetail">
+                <div class="admin-conversation-placeholder">
+                    <i class="fa-regular fa-comments"></i>
+                    <strong>Select a conversation</strong>
+                    <p>Choose a message thread to review its history. Messages cannot be edited or sent from this page.</p>
+                </div>
+            </div>
+        </div>
+        <p class="admin-privacy-note"><i class="fa-solid fa-lock"></i> Restricted admin view. Conversation access should be limited to authorised support, safety and dispute-handling purposes.</p>
     </section>
     <footer class="admin-footer">© 2026 Verilancer · Internal administration</footer>
 </main>
