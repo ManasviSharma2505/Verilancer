@@ -64,7 +64,7 @@ function renderUsers(search = "") {
     const tbody = document.getElementById("usersTable");
     const query = search.toLowerCase();
     const rows = cachedUsers.filter(user => [user.name, user.email, user.role, user.id].join(" ").toLowerCase().includes(query));
-    if (!rows.length) return showEmpty(tbody, 4, "No matching users found.");
+    if (!rows.length) return showEmpty(tbody, 5, "No matching users found.");
     tbody.replaceChildren();
     rows.forEach(user => {
         const row = document.createElement("tr");
@@ -77,8 +77,90 @@ function renderUsers(search = "") {
         roleCell.appendChild(role);
         row.appendChild(roleCell);
         addTextCell(row, `#${user.id}`);
+        const actionCell = document.createElement("td");
+        const viewButton = document.createElement("button");
+        viewButton.type = "button";
+        viewButton.className = "admin-user-view-btn";
+        viewButton.textContent = "View details";
+        viewButton.addEventListener("click", () => loadUserDetails(user.id));
+        actionCell.appendChild(viewButton);
+        row.appendChild(actionCell);
         tbody.appendChild(row);
     });
+}
+
+const userDetailFields = [
+    ["Email", "email"], ["Account type", "role"], ["Phone", "phone"],
+    ["Location", "location"], ["Headline", "headline"], ["Bio", "bio"],
+    ["Skills", "skills"], ["Portfolio", "portfolio"], ["Experience", "experience"],
+    ["Education", "education"], ["Certifications", "certifications"],
+    ["Availability", "availability"], ["Projects posted", "projectsPosted"],
+    ["Proposals submitted", "proposalsSubmitted"]
+];
+
+async function loadUserDetails(userId) {
+    const modal = document.getElementById("userDetailsModal");
+    const content = document.getElementById("userDetailsContent");
+    const title = document.getElementById("userDetailsTitle");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("admin-modal-open");
+    title.textContent = "Loading user…";
+    content.replaceChildren();
+    const loading = document.createElement("p");
+    loading.className = "admin-table-empty";
+    loading.textContent = "Loading account details…";
+    content.appendChild(loading);
+
+    try {
+        const user = await adminFetch(`/admin/users/${encodeURIComponent(userId)}`);
+        title.textContent = user.name || `User #${user.id}`;
+        content.replaceChildren();
+
+        const identity = document.createElement("div");
+        identity.className = "admin-user-identity";
+        const avatar = document.createElement("span");
+        avatar.className = "admin-user-avatar";
+        avatar.textContent = String(user.name || "U").trim().charAt(0).toUpperCase();
+        const identityText = document.createElement("div");
+        const name = document.createElement("strong");
+        name.textContent = user.name || "Unnamed user";
+        const id = document.createElement("small");
+        id.textContent = `User ID #${user.id}`;
+        identityText.append(name, id);
+        identity.append(avatar, identityText);
+        content.appendChild(identity);
+
+        const grid = document.createElement("div");
+        grid.className = "admin-user-details-grid";
+        userDetailFields.forEach(([label, key]) => {
+            const card = document.createElement("div");
+            card.className = "admin-user-detail";
+            const caption = document.createElement("span");
+            caption.textContent = label;
+            const value = document.createElement("p");
+            let displayValue = user[key];
+            if (key === "role") displayValue = user.role === "client" ? "Business" : "Professional";
+            if (displayValue === null || displayValue === undefined || displayValue === "") displayValue = "Not provided";
+            value.textContent = String(displayValue);
+            card.append(caption, value);
+            grid.appendChild(card);
+        });
+        content.appendChild(grid);
+    } catch (error) {
+        content.replaceChildren();
+        const message = document.createElement("p");
+        message.className = "admin-table-empty";
+        message.textContent = error.message || "Unable to load user details.";
+        content.appendChild(message);
+    }
+}
+
+function closeUserDetails() {
+    const modal = document.getElementById("userDetailsModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("admin-modal-open");
 }
 
 function renderProjects(search = "") {
@@ -294,6 +376,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById("usersSearch").addEventListener("input", event => renderUsers(event.target.value));
+    document.getElementById("closeUserDetails").addEventListener("click", closeUserDetails);
+    document.querySelectorAll("[data-close-user-modal]").forEach(element => element.addEventListener("click", closeUserDetails));
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeUserDetails();
+    });
     document.getElementById("projectsSearch").addEventListener("input", event => renderProjects(event.target.value));
     document.getElementById("proposalsSearch").addEventListener("input", event => renderProposals(event.target.value));
     document.getElementById("conversationsSearch").addEventListener("input", event => renderConversations(event.target.value));
