@@ -3544,7 +3544,8 @@ max-width:100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: start;
     gap: clamp(18px, 2.5vw, 36px);
-    padding-top: 12px;
+    /* Align link-group headings with the brand headline beneath the logo. */
+    padding-top: 114px;
 }
 
 .footer-column {
