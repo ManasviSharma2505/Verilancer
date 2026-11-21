@@ -11,8 +11,16 @@
 </head>
 <body class="admin-dashboard-page">
 <aside class="admin-sidebar">
-    <a class="admin-sidebar-brand" href="index.html"><img src="images/verilancer-logo-transparent.png" alt="Verilancer"></a>
-    <div class="admin-sidebar-label">WORKSPACE</div>
+    <div class="admin-brand-panel">
+        <a class="admin-sidebar-brand" href="index.html" aria-label="Verilancer home"><img src="images/verilancer-logo-transparent.png" alt="Verilancer"></a>
+        <span class="admin-brand-caption">CONTROL CENTER</span>
+    </div>
+    <div class="admin-workspace-card">
+        <span class="admin-workspace-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <div><strong>Founders workspace</strong><small>Private administration</small></div>
+        <span class="admin-workspace-status" title="Secure session"></span>
+    </div>
+    <div class="admin-sidebar-label">MANAGE PLATFORM</div>
     <nav class="admin-nav">
         <button class="admin-nav-link active" data-section="overview"><i class="fa-solid fa-chart-pie"></i> Overview</button>
         <button class="admin-nav-link" data-section="users"><i class="fa-solid fa-users"></i> Users</button>
@@ -20,6 +28,7 @@
         <button class="admin-nav-link" data-section="proposals"><i class="fa-solid fa-file-lines"></i> Proposals</button>
     </nav>
     <div class="admin-sidebar-bottom">
+        <div class="admin-sidebar-bottom-label">QUICK LINKS</div>
         <a href="index.html"><i class="fa-solid fa-arrow-up-right-from-square"></i> View website</a>
         <button id="adminLogout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
     </div>
