@@ -946,3 +946,21 @@ button {
 .notification-empty strong { color: #344054; font-size: 12px; }
 .notification-empty span { max-width: 230px; line-height: 1.5; }
 @media (max-width: 500px) { .notification-panel { right: -55px; } }
+
+
+/* Custom logout confirmation modal */
+.logout-modal[hidden] { display: none; }
+.logout-modal { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.logout-modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, .48); backdrop-filter: blur(3px); }
+.logout-modal-card { position: relative; width: 100%; max-width: 390px; padding: 30px; border: 1px solid #e8edf3; border-radius: 18px; background: #fff; box-shadow: 0 22px 65px rgba(15, 23, 42, .2); text-align: center; animation: logoutModalIn .18s ease-out; }
+.logout-modal-icon { width: 52px; height: 52px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff1f1; color: #d14343; font-size: 20px; }
+.logout-modal-card h2 { margin: 0; color: #1f2937; font-size: 19px; font-weight: 600; }
+.logout-modal-card p { margin: 9px 0 24px; color: #6b7280; font-size: 13px; line-height: 1.6; }
+.logout-modal-actions { display: flex; gap: 10px; }
+.logout-modal-actions button { flex: 1; padding: 11px 14px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+.logout-cancel { border: 1px solid #d7dde6; background: #fff; color: #374151; }
+.logout-cancel:hover { background: #f7f9fc; }
+.logout-confirm { background: #c83d45; color: #fff; }
+.logout-confirm:hover { background: #ad3038; }
+@keyframes logoutModalIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 420px) { .logout-modal-card { padding: 25px 20px; } }
