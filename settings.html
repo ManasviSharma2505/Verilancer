@@ -60,6 +60,19 @@
  </section>
  <footer class="dashboard-footer"><p>© 2026 Verilancer. Where talent meets opportunities.</p></footer>
 </main>
+
+<div class="logout-modal" id="logoutModal" hidden>
+ <div class="logout-modal-backdrop" data-close-logout></div>
+ <section class="logout-modal-card" role="dialog" aria-modal="true" aria-labelledby="logoutModalTitle" aria-describedby="logoutModalDescription">
+  <div class="logout-modal-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+  <h2 id="logoutModalTitle">Log out of Verilancer?</h2>
+  <p id="logoutModalDescription">Are you sure you want to log out of your account?</p>
+  <div class="logout-modal-actions">
+   <button type="button" class="logout-cancel" id="cancelLogout">Cancel</button>
+   <button type="button" class="logout-confirm" id="confirmLogout">Yes, log out</button>
+  </div>
+ </section>
+</div>
 <script src="js/settings.js"></script>
 <script src="js/role-access.js"></script>
 </body>
