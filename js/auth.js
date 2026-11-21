@@ -78,6 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.querySelector(".login-form");
 
     if (loginForm) {
+        const loginMessage = document.getElementById("login-message");
+
+        const showLoginMessage = (message, type = "error") => {
+            loginMessage.textContent = message;
+            loginMessage.className = `auth-message ${type}`;
+            loginMessage.hidden = false;
+        };
+
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -100,13 +108,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!response.ok) {
                 console.error("Login failed:", response.status, data);
-                alert("Login error (" + response.status + "): " + (data.message || "Unknown error"));
+                showLoginMessage(data.message || "Login failed. Please check your details and try again.");
                 return;
             }
 
                 if (!data.user || !data.user.id) {
                     console.error("Unexpected login response:", data);
-                    alert("Login response is missing user information.");
+                    showLoginMessage("We could not verify your account details. Please try again.");
                     return;
                 }
 
@@ -117,15 +125,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 localStorage.setItem("verilancerLoggedIn", "true");
 
-                alert("Login successful!");
-                window.location.href = "dashboard.html";
+                showLoginMessage("Login successful! Redirecting to your dashboard...", "success");
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 900);
 
             } catch (error) {
                 console.error("Login error:", error);
 
-                alert(
-                    "Unable to connect to the local backend. Check that it is running on port 5001."
-                );
+                showLoginMessage("Unable to connect to Verilancer. Please try again in a moment.");
             }
         });
     }
