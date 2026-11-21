@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Access | Verilancer</title>
+<link rel="icon" href="images/verilancer-logo-transparent.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-auth-page">
+<main class="admin-auth-card">
+    <a class="admin-brand" href="index.html"><img src="images/verilancer-logo-transparent.png" alt="Verilancer"></a>
+    <span class="admin-eyebrow">PRIVATE ACCESS</span>
+    <h1>Admin sign in</h1>
+    <p class="admin-auth-copy">This area is restricted to the Verilancer founding team.</p>
+    <form id="adminLoginForm">
+        <label for="adminPassword">Master password</label>
+        <div class="admin-password-wrap">
+            <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter admin password" required>
+            <button type="button" id="togglePassword" aria-label="Show password"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <p id="adminLoginMessage" class="admin-message" role="status" aria-live="polite" hidden></p>
+        <button class="admin-primary-btn" id="adminLoginButton" type="submit">Secure sign in <span>→</span></button>
+    </form>
+    <a class="admin-back-link" href="index.html">← Back to Verilancer</a>
+    <p class="admin-security-note"><i class="fa-solid fa-shield-halved"></i> Protected admin environment</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
+<script src="js/admin-login.js"></script>
+</body>
+</html>
