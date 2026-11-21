@@ -496,8 +496,9 @@
 
 .browse-footer {
     margin-top: 76px;
-    padding: 28px 0 20px;
-    border-top: 1px solid var(--browse-border);
+    padding: 28px 5% 20px;
+    background: #1F2937;
+    color: #fff;
 }
 
 .browse-footer-main {
@@ -529,7 +530,7 @@
 
 .browse-footer p {
     margin: 0;
-    color: var(--browse-muted);
+    color: #B8C2CF;
     font-size: 12px;
 }
 
@@ -544,7 +545,7 @@
 .browse-footer-links a,
 .browse-footer-socials a,
 .browse-footer-bottom a {
-    color: var(--browse-muted);
+    color: #B8C2CF;
     font-size: 12px;
     font-weight: 600;
     transition: color 0.2s ease;
@@ -553,7 +554,7 @@
 .browse-footer-links a:hover,
 .browse-footer-socials a:hover,
 .browse-footer-bottom a:hover {
-    color: var(--browse-green);
+    color: #2D7FF9;
 }
 
 .browse-footer-bottom {
@@ -562,8 +563,8 @@
     justify-content: space-between;
     gap: 16px;
     padding-top: 16px;
-    border-top: 1px solid var(--browse-border);
-    color: var(--browse-muted);
+    border-top: 1px solid rgba(255,255,255,.08);
+    color: #9CA3AF;
     font-size: 11px;
 }
 
