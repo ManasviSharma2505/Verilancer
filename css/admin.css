@@ -178,3 +178,7 @@ td strong{font-size:11px;color:#263852}
     .admin-sidebar-bottom{padding-top:12px}
     .admin-sidebar-bottom a,.admin-sidebar-bottom button{justify-content:center}
 }
+
+.admin-topbar-right button:disabled{opacity:.65;cursor:wait;background:#f7faff}
+.admin-topbar-right button[aria-busy="true"]{border-color:#cfe0fa;color:#1f5fbf}
+.admin-load-message{min-height:42px;transition:color .18s ease}
