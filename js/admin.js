@@ -120,10 +120,25 @@ function renderProposals(search = "") {
     });
 }
 
+let adminRefreshInProgress = false;
+
 async function loadAdminData() {
+    if (adminRefreshInProgress) return;
+    adminRefreshInProgress = true;
+
     const loadMessage = document.getElementById("adminLoadMessage");
-    loadMessage.textContent = "Loading platform data…";
+    const refreshButton = document.getElementById("adminRefresh");
+    const refreshIcon = refreshButton?.querySelector("i");
+
+    loadMessage.textContent = "Refreshing platform data…";
     loadMessage.className = "admin-load-message";
+    if (refreshButton) {
+        refreshButton.disabled = true;
+        refreshButton.setAttribute("aria-busy", "true");
+        refreshButton.title = "Refreshing data…";
+    }
+    refreshIcon?.classList.add("fa-spin");
+
     try {
         const [overview, users, projects, proposals] = await Promise.all([
             adminFetch("/admin/overview"),
@@ -131,9 +146,10 @@ async function loadAdminData() {
             adminFetch("/admin/projects"),
             adminFetch("/admin/proposals")
         ]);
-        cachedUsers = users;
-        cachedProjects = projects;
-        cachedProposals = proposals;
+
+        cachedUsers = Array.isArray(users) ? users : [];
+        cachedProjects = Array.isArray(projects) ? projects : [];
+        cachedProposals = Array.isArray(proposals) ? proposals : [];
 
         const stats = {
             statTotalUsers: overview.totalUsers,
@@ -144,15 +160,29 @@ async function loadAdminData() {
             statTotalProposals: overview.totalProposals,
             statPendingProposals: overview.pendingProposals
         };
-        Object.entries(stats).forEach(([id, value]) => setCellContent(document.getElementById(id), Number(value || 0).toLocaleString("en-IN")));
-        renderUsers(document.getElementById("usersSearch").value);
-        renderProjects(document.getElementById("projectsSearch").value);
-        renderProposals(document.getElementById("proposalsSearch").value);
-        document.getElementById("adminLastUpdated").textContent = `Updated ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-        loadMessage.textContent = "Platform data loaded.";
+        Object.entries(stats).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) setCellContent(element, Number(value || 0).toLocaleString("en-IN"));
+        });
+
+        renderUsers(document.getElementById("usersSearch")?.value || "");
+        renderProjects(document.getElementById("projectsSearch")?.value || "");
+        renderProposals(document.getElementById("proposalsSearch")?.value || "");
+
+        const updatedAt = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        document.getElementById("adminLastUpdated").textContent = `Updated ${updatedAt}`;
+        loadMessage.textContent = "All platform data is up to date.";
     } catch (error) {
-        loadMessage.textContent = error.message;
+        loadMessage.textContent = error.message || "Refresh failed. Check that the backend is running and try again.";
         loadMessage.className = "admin-load-message error";
+    } finally {
+        adminRefreshInProgress = false;
+        if (refreshButton) {
+            refreshButton.disabled = false;
+            refreshButton.removeAttribute("aria-busy");
+            refreshButton.title = "Refresh data";
+        }
+        refreshIcon?.classList.remove("fa-spin");
     }
 }
 
