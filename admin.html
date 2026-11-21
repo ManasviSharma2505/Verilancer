@@ -57,8 +57,22 @@
 
     <section class="admin-section" id="section-users">
         <div class="admin-section-heading"><div><h2>Users</h2><p>Latest registered accounts on the platform.</p></div><input class="admin-search" id="usersSearch" type="search" placeholder="Search name, email or role…"></div>
-        <div class="admin-table-wrap"><table><thead><tr><th>Account</th><th>Email</th><th>Account type</th><th>User ID</th></tr></thead><tbody id="usersTable"><tr><td colspan="4" class="admin-table-empty">Loading users…</td></tr></tbody></table></div>
+        <div class="admin-table-wrap"><table><thead><tr><th>Account</th><th>Email</th><th>Account type</th><th>User ID</th><th>Details</th></tr></thead><tbody id="usersTable"><tr><td colspan="5" class="admin-table-empty">Loading users…</td></tr></tbody></table></div>
     </section>
+
+    <div class="admin-user-modal" id="userDetailsModal" aria-hidden="true">
+        <div class="admin-user-modal-backdrop" data-close-user-modal></div>
+        <section class="admin-user-modal-card" role="dialog" aria-modal="true" aria-labelledby="userDetailsTitle">
+            <div class="admin-user-modal-header">
+                <div><span class="admin-eyebrow">ACCOUNT RECORD</span><h2 id="userDetailsTitle">User details</h2></div>
+                <button type="button" class="admin-user-modal-close" id="closeUserDetails" aria-label="Close user details"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="userDetailsContent" class="admin-user-details-content">
+                <p class="admin-table-empty">Select a user to view their details.</p>
+            </div>
+            <p class="admin-privacy-note"><i class="fa-solid fa-lock"></i> Sensitive credentials are never displayed. Passwords remain securely hashed.</p>
+        </section>
+    </div>
 
     <section class="admin-section" id="section-projects">
         <div class="admin-section-heading"><div><h2>Projects</h2><p>Projects posted by businesses.</p></div><input class="admin-search" id="projectsSearch" type="search" placeholder="Search title, category or status…"></div>
