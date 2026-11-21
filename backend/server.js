@@ -235,6 +235,66 @@ app.get("/api/admin/proposals", requireAdmin, (req, res) => {
 });
 
 
+// Admin conversation access is read-only. Message contents are never modified here.
+app.get("/api/admin/conversations", requireAdmin, (req, res) => {
+    const search = String(req.query.search || "").trim();
+    const like = `%${search}%`;
+    db.query(
+        `SELECT a.id AS applicationId, p.title AS projectTitle,
+                professional.name AS professionalName, professional.email AS professionalEmail,
+                business.name AS businessName, business.email AS businessEmail,
+                COUNT(m.id) AS messageCount,
+                MAX(m.created_at) AS lastMessageAt,
+                (SELECT latest.message FROM project_messages latest
+                 WHERE latest.application_id = a.id
+                 ORDER BY latest.created_at DESC, latest.id DESC LIMIT 1) AS lastMessage
+         FROM project_applications a
+         JOIN projects p ON p.id = a.project_id
+         JOIN users professional ON professional.id = a.professional_id
+         JOIN users business ON business.id = p.business_id
+         JOIN project_messages m ON m.application_id = a.id
+         WHERE (? = '' OR p.title LIKE ? OR professional.name LIKE ?
+                OR professional.email LIKE ? OR business.name LIKE ? OR business.email LIKE ?)
+         GROUP BY a.id, p.title, professional.name, professional.email,
+                  business.name, business.email
+         ORDER BY MAX(m.created_at) DESC, a.id DESC
+         LIMIT 500`,
+        [search, like, like, like, like, like],
+        (err, rows) => {
+            if (err) {
+                console.error("Admin conversations error:", err);
+                return res.status(500).json({ message: "Unable to load conversations." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
+app.get("/api/admin/conversations/:applicationId", requireAdmin, (req, res) => {
+    const applicationId = Number(req.params.applicationId);
+    if (!Number.isInteger(applicationId) || applicationId < 1) {
+        return res.status(400).json({ message: "Invalid conversation reference." });
+    }
+    db.query(
+        `SELECT m.id, m.application_id AS applicationId, m.sender_id AS senderId,
+                m.message, m.created_at AS createdAt, u.name AS senderName,
+                u.email AS senderEmail
+         FROM project_messages m
+         JOIN users u ON u.id = m.sender_id
+         WHERE m.application_id = ?
+         ORDER BY m.created_at ASC, m.id ASC`,
+        [applicationId],
+        (err, rows) => {
+            if (err) {
+                console.error("Admin conversation detail error:", err);
+                return res.status(500).json({ message: "Unable to load this conversation." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
+
 // Notification storage and preference tables are created automatically.
 db.query(`
     CREATE TABLE IF NOT EXISTS notification_preferences (
