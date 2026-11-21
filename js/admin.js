@@ -58,6 +58,7 @@ function showEmpty(tbody, columns, message) {
 let cachedUsers = [];
 let cachedProjects = [];
 let cachedProposals = [];
+let cachedConversations = [];
 
 function renderUsers(search = "") {
     const tbody = document.getElementById("usersTable");
@@ -100,6 +101,98 @@ function renderProjects(search = "") {
     });
 }
 
+function renderConversations(search = "") {
+    const container = document.getElementById("conversationsList");
+    const query = search.toLowerCase();
+    const rows = cachedConversations.filter(thread =>
+        [thread.projectTitle, thread.professionalName, thread.professionalEmail,
+         thread.businessName, thread.businessEmail, thread.lastMessage]
+        .join(" ").toLowerCase().includes(query)
+    );
+    document.getElementById("conversationCount").textContent = `${rows.length} threads`;
+    container.replaceChildren();
+    if (!rows.length) {
+        const empty = document.createElement("div");
+        empty.className = "admin-table-empty";
+        empty.textContent = "No conversations found.";
+        container.appendChild(empty);
+        return;
+    }
+    rows.forEach(thread => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "admin-conversation-item";
+        button.dataset.applicationId = thread.applicationId;
+        const title = document.createElement("strong");
+        title.textContent = thread.projectTitle || `Project #${thread.applicationId}`;
+        const people = document.createElement("span");
+        people.textContent = `${thread.professionalName} ↔ ${thread.businessName}`;
+        const preview = document.createElement("small");
+        preview.textContent = thread.lastMessage || "No message preview";
+        const meta = document.createElement("small");
+        meta.textContent = `${thread.messageCount} messages · ${thread.lastMessageAt ? new Date(thread.lastMessageAt).toLocaleString() : "Date unavailable"}`;
+        button.append(title, people, preview, meta);
+        button.addEventListener("click", () => loadConversation(thread.applicationId, button));
+        container.appendChild(button);
+    });
+}
+
+async function loadConversation(applicationId, selectedButton) {
+    document.querySelectorAll(".admin-conversation-item").forEach(item => item.classList.remove("active"));
+    selectedButton?.classList.add("active");
+    const detail = document.getElementById("conversationDetail");
+    detail.replaceChildren();
+    const loading = document.createElement("div");
+    loading.className = "admin-conversation-placeholder";
+    loading.textContent = "Loading message history…";
+    detail.appendChild(loading);
+    try {
+        const messages = await adminFetch(`/admin/conversations/${encodeURIComponent(applicationId)}`);
+        const thread = cachedConversations.find(item => Number(item.applicationId) === Number(applicationId));
+        detail.replaceChildren();
+        const header = document.createElement("div");
+        header.className = "admin-thread-header";
+        const heading = document.createElement("strong");
+        heading.textContent = thread?.projectTitle || `Conversation #${applicationId}`;
+        const subheading = document.createElement("span");
+        subheading.textContent = thread ? `${thread.professionalName} (${thread.professionalEmail}) · ${thread.businessName} (${thread.businessEmail})` : `Application #${applicationId}`;
+        const readOnly = document.createElement("small");
+        readOnly.textContent = "READ ONLY · MESSAGE HISTORY";
+        header.append(heading, subheading, readOnly);
+        const messageList = document.createElement("div");
+        messageList.className = "admin-thread-messages";
+        if (!messages.length) {
+            const empty = document.createElement("p");
+            empty.className = "admin-table-empty";
+            empty.textContent = "No messages in this conversation.";
+            messageList.appendChild(empty);
+        }
+        messages.forEach(message => {
+            const item = document.createElement("article");
+            item.className = "admin-thread-message";
+            const meta = document.createElement("div");
+            meta.className = "admin-thread-message-meta";
+            const sender = document.createElement("strong");
+            sender.textContent = message.senderName || "Unknown sender";
+            const timestamp = document.createElement("time");
+            const date = new Date(message.createdAt);
+            timestamp.textContent = Number.isNaN(date.getTime()) ? "" : date.toLocaleString();
+            meta.append(sender, timestamp);
+            const body = document.createElement("p");
+            body.textContent = message.message || "";
+            item.append(meta, body);
+            messageList.appendChild(item);
+        });
+        detail.append(header, messageList);
+    } catch (error) {
+        detail.replaceChildren();
+        const message = document.createElement("p");
+        message.className = "admin-table-empty";
+        message.textContent = error.message || "Unable to load conversation.";
+        detail.appendChild(message);
+    }
+}
+
 function renderProposals(search = "") {
     const tbody = document.getElementById("proposalsTable");
     const query = search.toLowerCase();
@@ -140,16 +233,18 @@ async function loadAdminData() {
     refreshIcon?.classList.add("fa-spin");
 
     try {
-        const [overview, users, projects, proposals] = await Promise.all([
+        const [overview, users, projects, proposals, conversations] = await Promise.all([
             adminFetch("/admin/overview"),
             adminFetch("/admin/users"),
             adminFetch("/admin/projects"),
-            adminFetch("/admin/proposals")
+            adminFetch("/admin/proposals"),
+            adminFetch("/admin/conversations")
         ]);
 
         cachedUsers = Array.isArray(users) ? users : [];
         cachedProjects = Array.isArray(projects) ? projects : [];
         cachedProposals = Array.isArray(proposals) ? proposals : [];
+        cachedConversations = Array.isArray(conversations) ? conversations : [];
 
         const stats = {
             statTotalUsers: overview.totalUsers,
@@ -168,6 +263,7 @@ async function loadAdminData() {
         renderUsers(document.getElementById("usersSearch")?.value || "");
         renderProjects(document.getElementById("projectsSearch")?.value || "");
         renderProposals(document.getElementById("proposalsSearch")?.value || "");
+        renderConversations(document.getElementById("conversationsSearch")?.value || "");
 
         const updatedAt = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         document.getElementById("adminLastUpdated").textContent = `Updated ${updatedAt}`;
@@ -200,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("usersSearch").addEventListener("input", event => renderUsers(event.target.value));
     document.getElementById("projectsSearch").addEventListener("input", event => renderProjects(event.target.value));
     document.getElementById("proposalsSearch").addEventListener("input", event => renderProposals(event.target.value));
+    document.getElementById("conversationsSearch").addEventListener("input", event => renderConversations(event.target.value));
     document.getElementById("adminRefresh").addEventListener("click", loadAdminData);
     document.getElementById("adminLogout").addEventListener("click", () => {
         sessionStorage.removeItem("verilancerAdminToken");
