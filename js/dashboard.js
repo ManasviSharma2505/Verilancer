@@ -345,25 +345,33 @@ const projects = await response.json();
     });
 
 
-    // 9. Logout with final confirmation
-    const logoutButton = document.querySelector(
-        "[data-dashboard-logout]"
-    );
+    // 9. Custom logout confirmation modal
+    const logoutButton = document.querySelector("[data-dashboard-logout]");
+    const logoutModal = get("logoutModal");
+    const cancelLogout = get("cancelLogout");
+    const confirmLogout = get("confirmLogout");
 
-    if (logoutButton) {
-        logoutButton.addEventListener("click", function (event) {
+    const closeLogoutModal = () => {
+        if (logoutModal) logoutModal.hidden = true;
+    };
+
+    if (logoutButton && logoutModal) {
+        logoutButton.addEventListener("click", event => {
             event.preventDefault();
-
-            const confirmLogout = confirm(
-                "Are you sure you want to log out?"
-            );
-
-            if (confirmLogout) {
-                localStorage.removeItem("verilancerLoggedIn");
-                localStorage.removeItem("verilancerUser");
-
-                window.location.href = "index.html";
-            }
+            logoutModal.hidden = false;
+            cancelLogout?.focus();
+        });
+        cancelLogout?.addEventListener("click", closeLogoutModal);
+        logoutModal.querySelectorAll("[data-close-logout]").forEach(element => {
+            element.addEventListener("click", closeLogoutModal);
+        });
+        confirmLogout?.addEventListener("click", () => {
+            localStorage.removeItem("verilancerLoggedIn");
+            localStorage.removeItem("verilancerUser");
+            window.location.href = "index.html";
+        });
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && !logoutModal.hidden) closeLogoutModal();
         });
     }
 
