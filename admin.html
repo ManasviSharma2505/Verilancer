@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Verilancer</title>
+<link rel="icon" href="images/verilancer-logo-transparent.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-dashboard-page">
+<aside class="admin-sidebar">
+    <a class="admin-sidebar-brand" href="index.html"><img src="images/verilancer-logo-transparent.png" alt="Verilancer"></a>
+    <div class="admin-sidebar-label">WORKSPACE</div>
+    <nav class="admin-nav">
+        <button class="admin-nav-link active" data-section="overview"><i class="fa-solid fa-chart-pie"></i> Overview</button>
+        <button class="admin-nav-link" data-section="users"><i class="fa-solid fa-users"></i> Users</button>
+        <button class="admin-nav-link" data-section="projects"><i class="fa-solid fa-folder-open"></i> Projects</button>
+        <button class="admin-nav-link" data-section="proposals"><i class="fa-solid fa-file-lines"></i> Proposals</button>
+    </nav>
+    <div class="admin-sidebar-bottom">
+        <a href="index.html"><i class="fa-solid fa-arrow-up-right-from-square"></i> View website</a>
+        <button id="adminLogout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+    </div>
+</aside>
+<main class="admin-main">
+    <header class="admin-topbar">
+        <div><span class="admin-eyebrow">VERILANCER CONTROL CENTER</span><h1 id="adminPageTitle">Overview</h1></div>
+        <div class="admin-topbar-right"><span class="admin-live-dot"></span><span>Private admin session</span><button id="adminRefresh" title="Refresh data"><i class="fa-solid fa-rotate"></i></button></div>
+    </header>
+    <div id="adminLoadMessage" class="admin-load-message" role="status">Loading platform data…</div>
+
+    <section class="admin-section active" id="section-overview">
+        <div class="admin-welcome"><div><h2>Platform overview</h2><p>A snapshot of activity across Verilancer.</p></div><span id="adminLastUpdated">—</span></div>
+        <div class="admin-stat-grid">
+            <article class="admin-stat-card"><span class="admin-stat-icon blue"><i class="fa-solid fa-users"></i></span><div><p>Total users</p><strong id="statTotalUsers">—</strong></div><small>All registered accounts</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon violet"><i class="fa-solid fa-code"></i></span><div><p>Professionals</p><strong id="statProfessionals">—</strong></div><small>Professional accounts</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon amber"><i class="fa-solid fa-briefcase"></i></span><div><p>Businesses</p><strong id="statBusinesses">—</strong></div><small>Business accounts</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon green"><i class="fa-solid fa-folder-open"></i></span><div><p>Active projects</p><strong id="statActiveProjects">—</strong></div><small>Currently published</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon slate"><i class="fa-solid fa-circle-check"></i></span><div><p>Closed projects</p><strong id="statClosedProjects">—</strong></div><small>Marked as closed</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon rose"><i class="fa-solid fa-file-lines"></i></span><div><p>Total proposals</p><strong id="statTotalProposals">—</strong></div><small>Applications submitted</small></article>
+            <article class="admin-stat-card"><span class="admin-stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></span><div><p>Pending proposals</p><strong id="statPendingProposals">—</strong></div><small>Awaiting a decision</small></article>
+        </div>
+        <div class="admin-overview-note"><i class="fa-solid fa-circle-info"></i><div><strong>Admin tools are being introduced in stages.</strong><p>This first version provides a secure, read-only view of users, projects and proposals. Management actions will be added after the data views are verified.</p></div></div>
+    </section>
+
+    <section class="admin-section" id="section-users">
+        <div class="admin-section-heading"><div><h2>Users</h2><p>Latest registered accounts on the platform.</p></div><input class="admin-search" id="usersSearch" type="search" placeholder="Search name, email or role…"></div>
+        <div class="admin-table-wrap"><table><thead><tr><th>Account</th><th>Email</th><th>Account type</th><th>User ID</th></tr></thead><tbody id="usersTable"><tr><td colspan="4" class="admin-table-empty">Loading users…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="admin-section" id="section-projects">
+        <div class="admin-section-heading"><div><h2>Projects</h2><p>Projects posted by businesses.</p></div><input class="admin-search" id="projectsSearch" type="search" placeholder="Search title, category or status…"></div>
+        <div class="admin-table-wrap"><table><thead><tr><th>Project</th><th>Business</th><th>Category</th><th>Budget</th><th>Status</th><th>ID</th></tr></thead><tbody id="projectsTable"><tr><td colspan="6" class="admin-table-empty">Loading projects…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="admin-section" id="section-proposals">
+        <div class="admin-section-heading"><div><h2>Proposals</h2><p>Professional applications and their current status.</p></div><input class="admin-search" id="proposalsSearch" type="search" placeholder="Search project, person or status…"></div>
+        <div class="admin-table-wrap"><table><thead><tr><th>Project</th><th>Professional</th><th>Business</th><th>Bid amount</th><th>Status</th><th>ID</th></tr></thead><tbody id="proposalsTable"><tr><td colspan="6" class="admin-table-empty">Loading proposals…</td></tr></tbody></table></div>
+    </section>
+    <footer class="admin-footer">© 2026 Verilancer · Internal administration</footer>
+</main>
+<script src="js/admin.js"></script>
+</body>
+</html>
