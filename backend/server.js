@@ -196,6 +196,36 @@ app.get("/api/admin/users", requireAdmin, (req, res) => {
     );
 });
 
+app.get("/api/admin/users/:userId", requireAdmin, (req, res) => {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId) || userId <= 0) {
+        return res.status(400).json({ message: "Valid user ID is required." });
+    }
+
+    const sql = `
+        SELECT
+            u.id, u.name, u.email, u.role,
+            pp.bio, pp.skills, pp.phone, pp.location, pp.headline,
+            pp.portfolio, pp.experience, pp.education,
+            pp.certifications, pp.availability,
+            (SELECT COUNT(*) FROM projects pr WHERE pr.business_id = u.id) AS projectsPosted,
+            (SELECT COUNT(*) FROM project_applications pa WHERE pa.professional_id = u.id) AS proposalsSubmitted
+        FROM users u
+        LEFT JOIN professional_profiles pp ON pp.user_id = u.id
+        WHERE u.id = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [userId], (err, rows) => {
+        if (err) {
+            console.error("Admin user details error:", err);
+            return res.status(500).json({ message: "Unable to load user details." });
+        }
+        if (!rows.length) return res.status(404).json({ message: "User not found." });
+        return res.json(rows[0]);
+    });
+});
+
 app.get("/api/admin/projects", requireAdmin, (req, res) => {
     db.query(
         `SELECT p.id, p.title, p.category, p.status, p.budget,
