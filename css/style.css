@@ -1215,42 +1215,13 @@ button{
 
 }
 
-.journey-step:last-child .journey-circle{
-
-    animation: journeySuccess 20s infinite ease-in-out;
-
-    animation-delay:16s;
-
-}
-@keyframes journeySuccess {
-
-    0%,15%{
-
-        background:#fff;
-        color:var(--primary);
-        transform:scale(1);
-        box-shadow:none;
-
-    }
-
-    20%,35%{
-
-        background:#52B788;
-        color:white;
-        transform:scale(1.08);
-        box-shadow:0 0 18px rgba(82,183,136,.35);
-
-    }
-
-    40%,100%{
-
-        background:#fff;
-        color:var(--primary);
-        transform:scale(1);
-        box-shadow:none;
-
-    }
-
+/* Keep the final Project Journey step static; no recurring green pulse. */
+.journey-step:last-child .journey-circle {
+    animation: none;
+    background: #fff;
+    color: var(--primary);
+    transform: none;
+    box-shadow: none;
 }
 
 .journey-step{
