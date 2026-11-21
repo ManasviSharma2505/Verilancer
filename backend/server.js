@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const db = require("./db");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 
 const app = express();
@@ -62,6 +63,177 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+/* =====================================
+   PRIVATE ADMIN AUTHENTICATION + API
+   Configure ADMIN_MASTER_PASSWORD and
+   ADMIN_SESSION_SECRET in backend/.env.
+===================================== */
+
+const ADMIN_SESSION_TTL_SECONDS = 4 * 60 * 60;
+const adminLoginAttempts = new Map();
+
+function safeStringEqual(left, right) {
+    const a = Buffer.from(String(left || ""));
+    const b = Buffer.from(String(right || ""));
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+function createAdminToken() {
+    const now = Math.floor(Date.now() / 1000);
+    const payload = Buffer.from(JSON.stringify({
+        sub: "verilancer-admin",
+        iat: now,
+        exp: now + ADMIN_SESSION_TTL_SECONDS
+    })).toString("base64url");
+    const signature = crypto
+        .createHmac("sha256", process.env.ADMIN_SESSION_SECRET)
+        .update(payload)
+        .digest("base64url");
+    return payload + "." + signature;
+}
+
+function requireAdmin(req, res, next) {
+    const authorization = req.headers.authorization || "";
+    const token = authorization.startsWith("Bearer ")
+        ? authorization.slice(7)
+        : "";
+    const parts = token.split(".");
+    if (parts.length !== 2 || !process.env.ADMIN_SESSION_SECRET) {
+        return res.status(401).json({ message: "Admin authentication required." });
+    }
+
+    const expected = crypto
+        .createHmac("sha256", process.env.ADMIN_SESSION_SECRET)
+        .update(parts[0])
+        .digest("base64url");
+
+    if (!safeStringEqual(parts[1], expected)) {
+        return res.status(401).json({ message: "Invalid admin session." });
+    }
+
+    try {
+        const payload = JSON.parse(Buffer.from(parts[0], "base64url").toString("utf8"));
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.sub !== "verilancer-admin" || !Number.isInteger(payload.exp) || payload.exp <= now) {
+            return res.status(401).json({ message: "Admin session expired. Please sign in again." });
+        }
+        req.admin = true;
+        return next();
+    } catch (error) {
+        return res.status(401).json({ message: "Invalid admin session." });
+    }
+}
+
+app.post("/api/admin/login", (req, res) => {
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    const now = Date.now();
+    const attempt = adminLoginAttempts.get(ip) || { count: 0, resetAt: now + 15 * 60 * 1000 };
+
+    if (now > attempt.resetAt) {
+        attempt.count = 0;
+        attempt.resetAt = now + 15 * 60 * 1000;
+    }
+    if (attempt.count >= 5) {
+        return res.status(429).json({ message: "Too many attempts. Please try again in 15 minutes." });
+    }
+
+    const configuredPassword = process.env.ADMIN_MASTER_PASSWORD;
+    const sessionSecret = process.env.ADMIN_SESSION_SECRET;
+    if (!configuredPassword || configuredPassword.length < 16 || !sessionSecret || sessionSecret.length < 32) {
+        return res.status(503).json({ message: "Admin access is not configured on this server yet." });
+    }
+
+    const password = typeof req.body.password === "string" ? req.body.password : "";
+    if (!safeStringEqual(password, configuredPassword)) {
+        attempt.count += 1;
+        adminLoginAttempts.set(ip, attempt);
+        return res.status(401).json({ message: "Incorrect admin password." });
+    }
+
+    adminLoginAttempts.delete(ip);
+    return res.json({
+        message: "Admin login successful.",
+        token: createAdminToken(),
+        expiresIn: ADMIN_SESSION_TTL_SECONDS
+    });
+});
+
+app.get("/api/admin/session", requireAdmin, (req, res) => {
+    res.json({ authenticated: true });
+});
+
+app.get("/api/admin/overview", requireAdmin, (req, res) => {
+    const sql = `
+        SELECT
+            (SELECT COUNT(*) FROM users) AS totalUsers,
+            (SELECT COUNT(*) FROM users WHERE role = 'student') AS professionals,
+            (SELECT COUNT(*) FROM users WHERE role = 'client') AS businesses,
+            (SELECT COUNT(*) FROM projects WHERE status = 'published') AS activeProjects,
+            (SELECT COUNT(*) FROM projects WHERE status = 'closed') AS closedProjects,
+            (SELECT COUNT(*) FROM project_applications) AS totalProposals,
+            (SELECT COUNT(*) FROM project_applications WHERE status = 'pending') AS pendingProposals
+    `;
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.error("Admin overview error:", err);
+            return res.status(500).json({ message: "Unable to load admin overview." });
+        }
+        return res.json(rows[0]);
+    });
+});
+
+app.get("/api/admin/users", requireAdmin, (req, res) => {
+    db.query(
+        "SELECT id, name, email, role FROM users ORDER BY id DESC LIMIT 200",
+        (err, rows) => {
+            if (err) {
+                console.error("Admin users error:", err);
+                return res.status(500).json({ message: "Unable to load users." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
+app.get("/api/admin/projects", requireAdmin, (req, res) => {
+    db.query(
+        `SELECT p.id, p.title, p.category, p.status, p.budget,
+                u.name AS businessName, u.email AS businessEmail
+         FROM projects p
+         LEFT JOIN users u ON u.id = p.business_id
+         ORDER BY p.id DESC LIMIT 200`,
+        (err, rows) => {
+            if (err) {
+                console.error("Admin projects error:", err);
+                return res.status(500).json({ message: "Unable to load projects." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
+app.get("/api/admin/proposals", requireAdmin, (req, res) => {
+    db.query(
+        `SELECT a.id, a.bid_amount AS bidAmount, a.status,
+                p.title AS projectTitle,
+                professional.name AS professionalName,
+                business.name AS businessName
+         FROM project_applications a
+         JOIN projects p ON p.id = a.project_id
+         JOIN users professional ON professional.id = a.professional_id
+         JOIN users business ON business.id = p.business_id
+         ORDER BY a.id DESC LIMIT 200`,
+        (err, rows) => {
+            if (err) {
+                console.error("Admin proposals error:", err);
+                return res.status(500).json({ message: "Unable to load proposals." });
+            }
+            return res.json(rows);
+        }
+    );
+});
+
 
 // Notification storage and preference tables are created automatically.
 db.query(`
