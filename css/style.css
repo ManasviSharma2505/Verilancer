@@ -1817,209 +1817,26 @@ max-width:100%;
             COMMUNITY VOICES
 ========================================== */
 
-.community-section{
-
-    padding:120px 0;
-
-    background:#ffffff;
-
-}
-
-.community-container{
-
-    width:90%;
-    max-width:1300px;
-    margin:auto;
-
-}
-
-/* Heading */
-
-.community-header{
-
-    text-align:center;
-
-    max-width:760px;
-
-    margin:0 auto 80px;
-
-}
-
-.community-header h2{
-
-    font-size:52px;
-
-    color:var(--text);
-
-    margin:18px 0;
-
-    line-height:1.2;
-
-}
-
-.community-header h2 span{
-
-    color:var(--primary);
-
-}
-
-.community-header p{
-
-    font-size:18px;
-
-    color:var(--text-light);
-
-    line-height:1.8;
-
-}
-
-/* Cards */
-
-.community-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:30px;
-
-}
-
-/* Individual Card */
-
-.community-card{
-
-    background:#fff;
-
-    border:1px solid rgba(31,95,191,.08);
-
-    border-radius:24px;
-
-    padding:35px;
-
-    box-shadow:0 12px 35px rgba(0,0,0,.05);
-
-    transition:.3s ease;
-
-}
-
-.community-card:hover{
-
-    transform:translateY(-5px);
-
-    box-shadow:0 20px 45px rgba(31,95,191,.10);
-
-}
-
-/* Stars */
-
-.stars{
-
-    color:#FFC107;
-
-    font-size:20px;
-
-    letter-spacing:3px;
-
-    margin-bottom:25px;
-
-}
-
-/* Review */
-
-.review{
-
-    color:var(--text-light);
-
-    line-height:1.9;
-
-    font-size:16px;
-
-    margin-bottom:35px;
-
-    min-height:140px;
-
-}
-
-/* User */
-
-.user{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:18px;
-
-}
-
-/* Avatar */
-
-.avatar{
-
-    width:60px;
-
-    height:60px;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        var(--primary),
-        var(--primary-light)
-    );
-
-    color:#fff;
-
-    font-size:20px;
-
-    font-weight:700;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    flex-shrink:0;
-
-}
-
-/* User Info */
-
-.user-info h4{
-
-    font-size:20px;
-
-    color:var(--text);
-
-    margin-bottom:4px;
-
-}
-
-.user-info span{
-
-    color:var(--text-light);
-
-    font-size:15px;
-
-}
-
-/* Responsive */
-
-@media(max-width:1000px){
-
-    .community-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-}
-
-/* =====================================
-            CTA SECTION
-===================================== */
+/* ==========================================
+            COMMUNITY VOICES
+========================================== */
+.community-section{padding:110px 0;background:#fff}
+.community-container{width:90%;max-width:1100px;margin:auto}
+.community-header{text-align:center;max-width:760px;margin:0 auto 55px}
+.community-header h2{font-size:48px;color:var(--text);margin:18px 0;line-height:1.2}
+.community-header h2 span{color:var(--primary)}
+.community-header p{font-size:17px;color:var(--text-light);line-height:1.85}
+.community-feedback{display:flex;align-items:flex-start;gap:30px;max-width:900px;margin:auto;padding:42px;border:1px solid rgba(31,95,191,.12);border-radius:24px;background:linear-gradient(135deg,#F8FBFF 0%,#fff 75%);box-shadow:0 14px 38px rgba(31,95,191,.06)}
+.feedback-mark{width:64px;height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:center;border-radius:18px;color:var(--primary);background:rgba(45,127,249,.10)}
+.feedback-mark svg{width:30px;height:30px}
+.feedback-copy{flex:1}
+.feedback-eyebrow{color:var(--primary);font-size:12px;font-weight:700;letter-spacing:1.5px}
+.feedback-copy h3{margin:9px 0 12px;color:var(--text);font-size:25px;line-height:1.35}
+.feedback-copy p{margin-bottom:22px;color:var(--text-light);font-size:15px;line-height:1.85}
+.feedback-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:12px;background:var(--primary);color:#fff;text-decoration:none;font-size:14px;font-weight:600;transition:.25s ease}
+.feedback-btn:hover{background:var(--primary-light);transform:translateY(-2px)}
+.feedback-btn svg{width:17px;height:17px}
+@media(max-width:700px){.community-section{padding:80px 0}.community-header h2{font-size:36px}.community-feedback{flex-direction:column;padding:28px}.feedback-copy h3{font-size:22px}}
 
 .cta{
     width: 88%;
@@ -3724,3 +3541,8 @@ max-width:100%;
         transition: none;
     }
 }
+
+/* Expanded homepage FAQ answers */
+.faq-answer p{padding:0 28px 26px;color:var(--text-light);line-height:1.9;font-size:15px;max-width:900px}
+.faq-item.active .faq-answer{max-height:1200px}
+@media(max-width:768px){.faq-answer p{padding:0 20px 22px}}
