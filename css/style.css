@@ -3563,3 +3563,32 @@ max-width:100%;
 .eco-card:hover .eco-card-note span { transform: translate(3px, -3px); }
 @media (max-width: 900px) { .eco-card { min-height: 0; } .eco-card p { min-height: 0; } }
 @media (max-width: 560px) { .eco-card { padding: 28px 24px 24px; } .eco-card::before { top: 18px; right: 20px; font-size: 54px; } .eco-card h3 { font-size: 24px; } }
+
+
+/* Supporting details inside Discover Possibilities cards */
+.eco-card-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border-left: 2px solid rgba(31, 95, 191, .35);
+    background: rgba(31, 95, 191, .035);
+    border-radius: 0 8px 8px 0;
+}
+.eco-card-detail strong {
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .45px;
+    text-transform: uppercase;
+}
+.eco-card-detail span {
+    color: #687386;
+    font-size: 11px;
+    line-height: 1.65;
+}
+.eco-card p { min-height: 0; }
+@media (max-width: 560px) {
+    .eco-card-detail { margin-bottom: 17px; }
+}
