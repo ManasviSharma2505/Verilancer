@@ -82,14 +82,25 @@ document.addEventListener("DOMContentLoaded", async () => {
  savePreferences();
  get("projectNotifications").addEventListener("change", savePreferences);
  get("messageNotifications").addEventListener("change", savePreferences);
- const logout = () => {
-  if (!confirm("Are you sure you want to log out?")) return;
+ const logoutModal = get("logoutModal");
+ const closeLogoutModal = () => { logoutModal.hidden = true; };
+ const openLogoutModal = event => {
+  event.preventDefault();
+  logoutModal.hidden = false;
+  get("cancelLogout").focus();
+ };
+ get("logoutButton").addEventListener("click", openLogoutModal);
+ get("securityLogout").addEventListener("click", openLogoutModal);
+ get("cancelLogout").addEventListener("click", closeLogoutModal);
+ logoutModal.querySelectorAll("[data-close-logout]").forEach(element => element.addEventListener("click", closeLogoutModal));
+ get("confirmLogout").addEventListener("click", () => {
   localStorage.removeItem("verilancerLoggedIn");
   localStorage.removeItem("verilancerUser");
   window.location.href = "index.html";
- };
- get("logoutButton").addEventListener("click", event => {event.preventDefault();logout();});
- get("securityLogout").addEventListener("click", logout);
+ });
+ document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !logoutModal.hidden) closeLogoutModal();
+ });
  get("paymentsLink").addEventListener("click", event => {event.preventDefault();alert("Payments are coming soon to Verilancer.");});
  const menuButton = get("mobileMenuBtn");
  const sidebar = document.querySelector(".sidebar");
